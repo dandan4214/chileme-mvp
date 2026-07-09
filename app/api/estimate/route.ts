@@ -44,6 +44,39 @@ function extractJson(text: string) {
   return JSON.parse(match[0]) as Partial<Recognition>;
 }
 
+function extractAssistantText(data: unknown) {
+  const value = data as {
+    content?: unknown;
+    choices?: Array<{ message?: { content?: unknown }; text?: unknown }>;
+    completion?: unknown;
+  };
+
+  if (Array.isArray(value.content)) {
+    return value.content
+      .filter((part): part is { type?: string; text?: string } => Boolean(part) && typeof part === "object")
+      .filter((part) => !part.type || part.type === "text")
+      .map((part) => part.text || "")
+      .join("\n");
+  }
+
+  if (typeof value.content === "string") {
+    return value.content;
+  }
+
+  const firstChoice = value.choices?.[0];
+  if (typeof firstChoice?.message?.content === "string") {
+    return firstChoice.message.content;
+  }
+  if (typeof firstChoice?.text === "string") {
+    return firstChoice.text;
+  }
+  if (typeof value.completion === "string") {
+    return value.completion;
+  }
+
+  return "";
+}
+
 export async function POST(request: Request) {
   const { description, foods, profileContext } = (await request.json()) as {
     description?: string;
@@ -91,13 +124,11 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "这次分析没有成功，请稍后再试。" }, { status: response.status });
   }
 
-  const data = await response.json();
-  const text = Array.isArray(data?.content)
-    ? data.content
-        .filter((part: { type?: string }) => part?.type === "text")
-        .map((part: { text?: string }) => part.text || "")
-        .join("\n")
-    : "";
-
-  return NextResponse.json({ result: normalizeRecognition(extractJson(text)) });
+  try {
+    const data = await response.json();
+    const text = extractAssistantText(data);
+    return NextResponse.json({ result: normalizeRecognition(extractJson(text)) });
+  } catch {
+    return NextResponse.json({ error: "这次分析返回格式不稳定，请再试一次。" }, { status: 502 });
+  }
 }

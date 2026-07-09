@@ -43,6 +43,39 @@ function extractJson(text: string) {
   return JSON.parse(match[0]) as Partial<Recognition>;
 }
 
+function extractAssistantText(data: unknown) {
+  const value = data as {
+    content?: unknown;
+    choices?: Array<{ message?: { content?: unknown }; text?: unknown }>;
+    completion?: unknown;
+  };
+
+  if (Array.isArray(value.content)) {
+    return value.content
+      .filter((part): part is { type?: string; text?: string } => Boolean(part) && typeof part === "object")
+      .filter((part) => !part.type || part.type === "text")
+      .map((part) => part.text || "")
+      .join("\n");
+  }
+
+  if (typeof value.content === "string") {
+    return value.content;
+  }
+
+  const firstChoice = value.choices?.[0];
+  if (typeof firstChoice?.message?.content === "string") {
+    return firstChoice.message.content;
+  }
+  if (typeof firstChoice?.text === "string") {
+    return firstChoice.text;
+  }
+  if (typeof value.completion === "string") {
+    return value.completion;
+  }
+
+  return "";
+}
+
 function cleanApiKey(value: string) {
   return value.replace(/^Bearer\s+/i, "").trim();
 }
@@ -169,14 +202,21 @@ export async function POST(request: Request) {
     );
   }
 
-  const data = await response.json();
-  const text = Array.isArray(data?.content)
-    ? data.content
-        .filter((part: { type?: string }) => part?.type === "text")
-        .map((part: { text?: string }) => part.text || "")
-        .join("\n")
-    : "";
-  const parsed = extractJson(text);
+  let parsed: Partial<Recognition>;
+  try {
+    const data = await response.json();
+    parsed = extractJson(extractAssistantText(data));
+  } catch {
+    return NextResponse.json(
+      {
+        code: "KIMI_RESPONSE_PARSE_ERROR",
+        error: "这次图片分析返回格式不稳定，请再试一次。",
+        keySource: usedKey.source,
+        keyTail: getKeyTail(usedKey.key)
+      },
+      { status: 502 }
+    );
+  }
 
   return NextResponse.json({
     mode: "kimi",
