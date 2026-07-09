@@ -38,6 +38,106 @@ function normalizeRecognition(value: Partial<Recognition>): Recognition {
   };
 }
 
+const fallbackFoodRules: Array<Recognition & { aliases: string[] }> = [
+  {
+    aliases: ["蛋炒饭", "炒饭"],
+    foods: ["蛋炒饭"],
+    calories: 620,
+    protein: 18,
+    carbs: 92,
+    fat: 20,
+    vegetableRatio: 8,
+    verdict: ""
+  },
+  {
+    aliases: ["无糖豆浆", "豆浆"],
+    foods: ["无糖豆浆"],
+    calories: 100,
+    protein: 7,
+    carbs: 7,
+    fat: 4,
+    vegetableRatio: 0,
+    verdict: ""
+  },
+  {
+    aliases: ["番茄炒蛋", "西红柿炒鸡蛋"],
+    foods: ["番茄炒蛋"],
+    calories: 260,
+    protein: 14,
+    carbs: 12,
+    fat: 17,
+    vegetableRatio: 45,
+    verdict: ""
+  },
+  {
+    aliases: ["米饭"],
+    foods: ["米饭"],
+    calories: 180,
+    protein: 4,
+    carbs: 40,
+    fat: 1,
+    vegetableRatio: 0,
+    verdict: ""
+  },
+  {
+    aliases: ["青菜", "绿叶菜", "蔬菜"],
+    foods: ["青菜"],
+    calories: 80,
+    protein: 3,
+    carbs: 10,
+    fat: 3,
+    vegetableRatio: 90,
+    verdict: ""
+  },
+  {
+    aliases: ["鸡胸", "鸡胸肉"],
+    foods: ["鸡胸肉"],
+    calories: 220,
+    protein: 38,
+    carbs: 0,
+    fat: 6,
+    vegetableRatio: 0,
+    verdict: ""
+  }
+];
+
+function buildFallbackRecognition(input: string): Recognition {
+  const matched = fallbackFoodRules.filter((rule) => rule.aliases.some((alias) => input.includes(alias)));
+  if (!matched.length) {
+    return {
+      foods: [input.length > 18 ? `${input.slice(0, 18)}...` : input || "未确认餐食"],
+      calories: 500,
+      protein: 18,
+      carbs: 65,
+      fat: 18,
+      vegetableRatio: 15,
+      verdict: "已按常见单人份做保守估算，建议确认菜品和份量后再生成记录。"
+    };
+  }
+
+  const totals = matched.reduce(
+    (acc, item) => {
+      acc.calories += item.calories;
+      acc.protein += item.protein;
+      acc.carbs += item.carbs;
+      acc.fat += item.fat;
+      acc.vegetableRatio += item.vegetableRatio;
+      return acc;
+    },
+    { calories: 0, protein: 0, carbs: 0, fat: 0, vegetableRatio: 0 }
+  );
+
+  return {
+    foods: matched.flatMap((item) => item.foods),
+    calories: totals.calories,
+    protein: totals.protein,
+    carbs: totals.carbs,
+    fat: totals.fat,
+    vegetableRatio: Math.round(totals.vegetableRatio / matched.length),
+    verdict: "已按常见单人份做保守估算，实际热量会随份量和用油量变化。"
+  };
+}
+
 function extractJson(text: string) {
   const match = text.match(/\{[\s\S]*\}/);
   if (!match) {
@@ -131,6 +231,6 @@ export async function POST(request: Request) {
     const text = extractAssistantText(data);
     return NextResponse.json({ result: normalizeRecognition(extractJson(text)) });
   } catch {
-    return NextResponse.json({ error: "这次分析返回格式不稳定，请再试一次。" }, { status: 502 });
+    return NextResponse.json({ result: buildFallbackRecognition(input) });
   }
 }
