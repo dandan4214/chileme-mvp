@@ -58,6 +58,7 @@ type UserProfile = {
 };
 
 type ObservationRange = "week" | "month";
+type RecognitionStage = "idle" | "uploading" | "recognizing" | "returning";
 
 type SpeechRecognitionConstructor = new () => {
   lang: string;
@@ -332,9 +333,51 @@ function buildNextMealIdea(records: MealRecord[], profile: UserProfile, mood: Me
   };
 }
 
+function wait(ms: number) {
+  return new Promise((resolve) => window.setTimeout(resolve, ms));
+}
+
+function loadImage(src: string) {
+  return new Promise<HTMLImageElement>((resolve, reject) => {
+    const image = new Image();
+    image.onload = () => resolve(image);
+    image.onerror = reject;
+    image.src = src;
+  });
+}
+
+async function compressMealImage(file: File) {
+  const originalDataUrl = await new Promise<string>((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result));
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+
+  const image = await loadImage(originalDataUrl);
+  const maxSide = 1280;
+  const ratio = Math.min(1, maxSide / Math.max(image.naturalWidth, image.naturalHeight));
+  const width = Math.round(image.naturalWidth * ratio);
+  const height = Math.round(image.naturalHeight * ratio);
+
+  if (ratio === 1 && file.size < 900_000) {
+    return originalDataUrl;
+  }
+
+  const canvas = document.createElement("canvas");
+  canvas.width = width;
+  canvas.height = height;
+  const context = canvas.getContext("2d");
+  if (!context) return originalDataUrl;
+  context.drawImage(image, 0, 0, width, height);
+
+  return canvas.toDataURL("image/jpeg", 0.86);
+}
+
 export default function Home() {
   const [preview, setPreview] = useState<string | null>(null);
   const [isRecognizing, setIsRecognizing] = useState(false);
+  const [recognitionStage, setRecognitionStage] = useState<RecognitionStage>("idle");
   const [recognition, setRecognition] = useState<Recognition | null>(null);
   const [recognitionMode, setRecognitionMode] = useState<"kimi" | null>(null);
   const [recognitionError, setRecognitionError] = useState("");
@@ -404,6 +447,13 @@ export default function Home() {
   const selectedDateLabel = selectedDateKey === getDateKey(new Date()) ? "今天" : selectedDateKey;
   const macrosTotal = Math.max(totals.protein + totals.carbs + totals.fat, 1);
   const averageDailyCalories = observedDayCount ? Math.round(observedTotals.calories / observedDayCount) : 0;
+  const recognitionSteps: Array<{ key: RecognitionStage; title: string; desc: string }> = [
+    { key: "uploading", title: "上传中", desc: "正在压缩并上传餐食图片" },
+    { key: "recognizing", title: "识别中", desc: "正在识别菜品和常见份量" },
+    { key: "returning", title: "数据返回中", desc: "正在整理热量、营养和评价" }
+  ];
+  const activeRecognitionStepIndex = Math.max(0, recognitionSteps.findIndex((step) => step.key === recognitionStage));
+  const activeRecognitionStep = recognitionSteps.find((step) => step.key === recognitionStage) || recognitionSteps[0];
 
   function scrollToUpload() {
     uploadSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -456,17 +506,20 @@ export default function Home() {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    const reader = new FileReader();
-    reader.onload = async () => {
-      const imageDataUrl = String(reader.result);
-      setPreview(imageDataUrl);
+    void (async () => {
       setRecognition(null);
       setRecognitionMode(null);
       setRecognitionError("");
       setRecognitionDebug("");
       setIsRecognizing(true);
+      setRecognitionStage("uploading");
 
       try {
+        const imageDataUrl = await compressMealImage(file);
+        setPreview(imageDataUrl);
+        await wait(220);
+        setRecognitionStage("recognizing");
+
         const response = await fetch("/api/recognize", {
           method: "POST",
           headers: {
@@ -474,6 +527,7 @@ export default function Home() {
           },
           body: JSON.stringify({ imageDataUrl, profileContext })
         });
+        setRecognitionStage("returning");
         const data = (await response.json()) as {
           mode?: "kimi";
           result?: Recognition;
@@ -493,9 +547,9 @@ export default function Home() {
         setToast(message);
       } finally {
         setIsRecognizing(false);
+        setRecognitionStage("idle");
       }
-    };
-    reader.readAsDataURL(file);
+    })();
   }
 
   async function handleTextEstimate() {
@@ -772,8 +826,21 @@ export default function Home() {
             {isRecognizing ? (
               <div className={styles.loadingState}>
                 <Loader2 className={styles.spin} size={32} />
-                <strong>正在分析这一餐</strong>
-                <span>正在估算菜品、热量和营养结构...</span>
+                <strong>{activeRecognitionStep.title}</strong>
+                <span>{activeRecognitionStep.desc}</span>
+                <div className={styles.loadingSteps}>
+                  {recognitionSteps.map((step) => (
+                    <i
+                      key={step.key}
+                      className={[
+                        styles.loadingStep,
+                        activeRecognitionStepIndex >= recognitionSteps.findIndex((item) => item.key === step.key) ? styles.activeLoadingStep : ""
+                      ].filter(Boolean).join(" ")}
+                    >
+                      {step.title}
+                    </i>
+                  ))}
+                </div>
               </div>
             ) : recognition ? (
               <>
