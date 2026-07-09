@@ -1,0 +1,47 @@
+:root {
+  --bg: #f7faf7;
+  --surface: #ffffff;
+  --surface-soft: #edf6ef;
+  --surface-warm: #fff7e8;
+  --ink: #17211b;
+  --muted: #617066;
+  --line: #dfe8e1;
+  --green: #2f8f5b;
+  --green-dark: #17623c;
+  --mint: #dff5e8;
+  --amber: #f2b84b;
+  --coral: #e16f5c;
+  --blue: #4c7fbd;
+  --shadow: 0 18px 50px rgba(30, 63, 42, 0.1);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--bg);
+}
+
+body {
+  margin: 0;
+  color: var(--ink);
+  background:
+    linear-gradient(180deg, rgba(223, 245, 232, 0.9), rgba(247, 250, 247, 0) 340px),
+    var(--bg);
+  font-family: Arial, "PingFang SC", "Microsoft YaHei", sans-serif;
+}
+
+button,
+input,
+select {
+  font: inherit;
+}
+
+button {
+  border: 0;
+}
+
+img {
+  max-width: 100%;
+}

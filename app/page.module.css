@@ -1,0 +1,1380 @@
+.shell {
+  width: min(1120px, 100%);
+  margin: 0 auto;
+  padding: 22px 18px 48px;
+}
+
+.hero {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 16px 0 18px;
+}
+
+.brandRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.logo {
+  display: inline-grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 8px;
+  color: #fff;
+  background: var(--green);
+  box-shadow: 0 10px 25px rgba(47, 143, 91, 0.22);
+}
+
+.agentName {
+  color: var(--green-dark);
+  font-size: 14px;
+  font-weight: 700;
+  padding: 7px 10px;
+  border: 1px solid rgba(47, 143, 91, 0.22);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.hero h1 {
+  margin: 0;
+  font-size: clamp(42px, 9vw, 72px);
+  line-height: 0.98;
+  letter-spacing: 0;
+}
+
+.hero p {
+  max-width: 620px;
+  margin: 16px 0 0;
+  color: var(--muted);
+  font-size: 18px;
+  line-height: 1.7;
+}
+
+.heroActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.heroActions button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 42px;
+  padding: 0 14px;
+  border-radius: 8px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.heroActions button:first-child {
+  color: #fff;
+  background: var(--green);
+  box-shadow: 0 12px 28px rgba(47, 143, 91, 0.18);
+}
+
+.heroActions button:last-child {
+  color: var(--green-dark);
+  border: 1px solid rgba(47, 143, 91, 0.24);
+  background: rgba(255, 255, 255, 0.84);
+}
+
+.iconButton {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  flex: 0 0 auto;
+  color: var(--green-dark);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.8);
+  cursor: pointer;
+}
+
+.keyPanel {
+  margin: 0 0 16px;
+  padding: 14px;
+  border: 1px solid rgba(47, 143, 91, 0.18);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.78);
+  box-shadow: 0 12px 30px rgba(30, 63, 42, 0.07);
+}
+
+.keyPanelHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.keyPanelHead div {
+  display: grid;
+  gap: 5px;
+}
+
+.keyPanelHead span {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--green-dark);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.keyPanelHead strong {
+  font-size: 15px;
+}
+
+.keyPanelHead button,
+.keyForm button {
+  min-height: 40px;
+  padding: 0 14px;
+  color: #fff;
+  border-radius: 8px;
+  background: var(--green);
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.keyForm {
+  display: grid;
+  grid-template-columns: 1fr auto auto auto;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.keyForm input {
+  min-width: 0;
+  height: 42px;
+  padding: 0 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--ink);
+  background: #fff;
+  outline: none;
+}
+
+.keyForm .clearKeyButton {
+  color: var(--green-dark);
+  border: 1px solid var(--line);
+  background: #fff;
+}
+
+.keyForm .testKeyButton {
+  color: var(--green-dark);
+  border: 1px solid rgba(47, 143, 91, 0.28);
+  background: var(--mint);
+}
+
+.keyTestStatus {
+  margin: 10px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1.5;
+}
+
+.profilePanel {
+  margin: 0 0 16px;
+  padding: 16px;
+  border: 1px solid rgba(47, 143, 91, 0.16);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.86);
+  box-shadow: var(--shadow);
+}
+
+.profileHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.profileHeader div {
+  display: grid;
+  gap: 6px;
+}
+
+.profileHeader span {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--green-dark);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.profileHeader strong {
+  font-size: 16px;
+}
+
+.profileHeader button {
+  min-height: 40px;
+  padding: 0 14px;
+  color: #fff;
+  border-radius: 8px;
+  background: var(--green);
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.profileForm {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.profileForm label {
+  display: grid;
+  gap: 7px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.profileForm input,
+.profileForm select,
+.profileForm textarea {
+  min-width: 0;
+  padding: 0 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--ink);
+  background: #fff;
+  outline: none;
+}
+
+.profileForm input,
+.profileForm select {
+  height: 42px;
+}
+
+.profileForm textarea {
+  min-height: 78px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  resize: vertical;
+  line-height: 1.55;
+}
+
+.profileNeedBlock,
+.promptHint {
+  grid-column: 1 / -1;
+}
+
+.profileNeedBlock {
+  display: grid;
+  gap: 9px;
+}
+
+.profileNeedBlock > span {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.profileNeedBlock div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.profileNeedBlock button {
+  min-height: 34px;
+  padding: 0 10px;
+  color: var(--green-dark);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: #fff;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.profileNeedBlock .activeNeed {
+  color: #fff;
+  border-color: var(--green);
+  background: var(--green);
+}
+
+.promptHint {
+  margin: 0;
+  padding: 10px 12px;
+  color: var(--muted);
+  border: 1px solid rgba(47, 143, 91, 0.16);
+  border-radius: 8px;
+  background: #fbfdfb;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.55;
+}
+
+.profileChips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.profileChips span {
+  padding: 7px 10px;
+  color: var(--green-dark);
+  border-radius: 999px;
+  background: var(--mint);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.panel {
+  border: 1px solid rgba(32, 78, 48, 0.09);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.88);
+  box-shadow: var(--shadow);
+}
+
+.cardLabel,
+.sectionTitle span,
+.adviceCard span {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.panel {
+  margin-top: 16px;
+  padding: 20px;
+}
+
+.sectionTitle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.sectionTitle h2 {
+  margin: 5px 0 0;
+  font-size: 24px;
+}
+
+.sectionTitle svg {
+  color: var(--green);
+}
+
+.uploadGrid {
+  display: grid;
+  grid-template-columns: minmax(280px, 0.95fr) 1.05fr;
+  gap: 16px;
+}
+
+.inputColumn {
+  display: grid;
+  gap: 12px;
+}
+
+.uploadBox {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: 330px;
+  overflow: hidden;
+  color: var(--ink);
+  border: 1px dashed rgba(47, 143, 91, 0.42);
+  border-radius: 8px;
+  background: var(--surface-soft);
+  cursor: pointer;
+}
+
+.uploadBox img {
+  width: 100%;
+  height: 100%;
+  min-height: 330px;
+  object-fit: cover;
+}
+
+.uploadEmpty,
+.idleState,
+.loadingState,
+.errorState {
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  padding: 24px;
+  text-align: center;
+}
+
+.uploadEmpty svg,
+.idleState svg {
+  color: var(--green);
+}
+
+.errorState svg {
+  color: var(--coral);
+}
+
+.uploadEmpty span,
+.idleState span,
+.loadingState span,
+.errorState span {
+  max-width: 280px;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.errorState strong {
+  color: var(--coral);
+}
+
+.errorState small {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.errorState button {
+  min-height: 40px;
+  padding: 0 14px;
+  color: #fff;
+  border-radius: 8px;
+  background: var(--coral);
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.hiddenInput {
+  display: none;
+}
+
+.textMealBox {
+  display: grid;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+}
+
+.textMealBox textarea {
+  width: 100%;
+  resize: vertical;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 11px 12px;
+  color: var(--ink);
+  background: #fbfdfb;
+  line-height: 1.55;
+  outline: none;
+}
+
+.textMealActions {
+  display: grid;
+  grid-template-columns: 0.8fr 1fr 1fr;
+  gap: 10px;
+}
+
+.textMealActions button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 42px;
+  border-radius: 8px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.textMealActions button:last-child {
+  color: #fff;
+  background: var(--green);
+}
+
+.textMealActions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.72;
+}
+
+.recognitionCard {
+  min-height: 330px;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+}
+
+.spin {
+  color: var(--green);
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.resultHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.resultHeader span {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--green-dark);
+  font-weight: 700;
+}
+
+.resultHeader strong {
+  font-size: 24px;
+}
+
+.modelNote {
+  margin: 12px 0 0;
+  padding: 10px 12px;
+  color: #59665d;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #f8fbf8;
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.foodTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 18px 0;
+}
+
+.foodTags span {
+  padding: 8px 10px;
+  color: var(--green-dark);
+  border-radius: 999px;
+  background: var(--mint);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.nutritionRows {
+  display: grid;
+  gap: 13px;
+}
+
+.nutritionRow > div:first-child {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 6px;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.miniTrack {
+  overflow: hidden;
+  height: 8px;
+  border-radius: 999px;
+  background: #eef2ef;
+}
+
+.miniTrack i {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+}
+
+.green {
+  background: var(--green);
+}
+
+.blue {
+  background: var(--blue);
+}
+
+.coral {
+  background: var(--coral);
+}
+
+.amber {
+  background: var(--amber);
+}
+
+.verdict {
+  margin: 18px 0;
+  padding: 13px;
+  color: #4e5c52;
+  border-radius: 8px;
+  background: var(--surface-warm);
+  line-height: 1.6;
+}
+
+.actions {
+  display: grid;
+  gap: 10px;
+}
+
+.mealContextGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.mealContextGrid label {
+  display: grid;
+  gap: 6px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.mealContextGrid select {
+  width: 100%;
+  min-height: 42px;
+  padding: 0 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--ink);
+  background: #fff;
+}
+
+.moodPicker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.moodPicker button {
+  min-height: 34px;
+  padding: 0 10px;
+  color: var(--green-dark);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: #fff;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.moodPicker .activeMood {
+  color: #fff;
+  border-color: var(--green);
+  background: var(--green);
+}
+
+.actions button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 48px;
+  color: #fff;
+  border-radius: 8px;
+  background: var(--green);
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.mealList {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+}
+
+.mealCard {
+  min-height: 172px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+}
+
+.mealCardHead {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.mealCardHead span {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.emptyMeal {
+  display: grid;
+  place-items: center;
+  min-height: 104px;
+  padding: 16px;
+  color: var(--muted);
+  border-radius: 8px;
+  background: #f7faf7;
+  text-align: center;
+  line-height: 1.5;
+}
+
+.recordItem {
+  display: grid;
+  gap: 10px;
+  padding: 12px 0;
+  border-top: 1px solid var(--line);
+}
+
+.recordItem div {
+  display: grid;
+  gap: 6px;
+}
+
+.recordChips {
+  display: flex !important;
+  flex-wrap: wrap;
+  gap: 6px !important;
+}
+
+.recordChips i {
+  padding: 4px 7px;
+  color: var(--green-dark);
+  border-radius: 999px;
+  background: var(--mint);
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 800;
+}
+
+.recordItem b {
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.recordItem span {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.recordItem em {
+  color: var(--green-dark);
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 800;
+}
+
+.recordMeta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.recordMeta button,
+.secondaryButton,
+.primarySmallButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 34px;
+  padding: 0 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.recordMeta button,
+.secondaryButton {
+  color: var(--green-dark);
+  border: 1px solid var(--line);
+  background: #fff;
+}
+
+.primarySmallButton {
+  color: #fff;
+  background: var(--green);
+}
+
+.dangerButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 34px;
+  padding: 0 10px;
+  color: var(--coral);
+  border: 1px solid rgba(225, 111, 92, 0.28);
+  border-radius: 8px;
+  background: #fff7f4;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.editRecord {
+  display: grid;
+  gap: 12px;
+  padding: 12px;
+  border-top: 1px solid var(--line);
+  background: #fbfdfb;
+}
+
+.editRecord label {
+  display: grid;
+  gap: 6px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.editRecord input,
+.editRecord select,
+.editRecord textarea {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 9px 10px;
+  color: var(--ink);
+  background: #fff;
+  outline: none;
+}
+
+.editRecord textarea {
+  resize: vertical;
+  line-height: 1.5;
+}
+
+.fullField {
+  grid-column: 1 / -1;
+}
+
+.nutrientEditGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.readOnlyMetric {
+  display: grid;
+  gap: 5px;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+}
+
+.readOnlyMetric span {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.readOnlyMetric strong {
+  font-size: 14px;
+}
+
+.editActions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.analysisGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.analysisStats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.macroBlock,
+.adviceCard {
+  padding: 16px;
+  border-radius: 8px;
+  background: #fff;
+  border: 1px solid var(--line);
+}
+
+.macroBar {
+  display: flex;
+  overflow: hidden;
+  height: 22px;
+  border-radius: 999px;
+  background: #eef2ef;
+}
+
+.macroBar span {
+  min-width: 0;
+  transition: width 0.35s ease;
+}
+
+.macroLegend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 16px;
+  margin-top: 14px;
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.adviceCard p {
+  margin: 8px 0 0;
+  font-size: 18px;
+  line-height: 1.65;
+}
+
+.privacyNote {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+  padding: 12px 14px;
+  color: var(--muted);
+  border: 1px solid rgba(47, 143, 91, 0.16);
+  border-radius: 8px;
+  background: #fbfdfb;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.55;
+}
+
+.privacyNote svg {
+  flex: 0 0 auto;
+  color: var(--green);
+}
+
+.rangeSwitch {
+  display: inline-grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+  padding: 4px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+}
+
+.rangeSwitch button {
+  min-height: 34px;
+  padding: 0 12px;
+  color: var(--muted);
+  border-radius: 6px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.rangeSwitch .activeRange {
+  color: #fff;
+  background: var(--green);
+}
+
+.insightGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(320px, 0.75fr);
+  gap: 16px;
+}
+
+.insightGrid .panel {
+  min-width: 0;
+}
+
+.calendarPanel {
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+}
+
+.calendarHeader {
+  display: grid;
+  grid-template-columns: auto 1fr auto auto;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.calendarHeader strong {
+  justify-self: center;
+  font-size: 18px;
+}
+
+.calendarHeader button {
+  justify-self: start;
+  min-height: 30px;
+  padding: 0 9px;
+  color: var(--green-dark);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.calendarHeader button:last-child {
+  justify-self: end;
+  color: #fff;
+  border-color: var(--green);
+  background: var(--green);
+}
+
+.weekHeader,
+.calendarGrid,
+.weekCalendarGrid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.weekHeader {
+  margin-bottom: 6px;
+}
+
+.weekHeader span {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+  text-align: center;
+}
+
+.calendarDay {
+  display: grid;
+  align-content: start;
+  gap: 4px;
+  min-height: 58px;
+  padding: 7px;
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fbfdfb;
+  text-align: left;
+  cursor: pointer;
+}
+
+.calendarDay span {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.calendarDay b {
+  font-size: 13px;
+}
+
+.calendarDay i {
+  color: var(--green-dark);
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 800;
+}
+
+.calendarDay em {
+  width: 6px;
+  height: 6px;
+  margin-top: auto;
+  border-radius: 999px;
+  background: #e4eee7;
+}
+
+.mutedDay {
+  opacity: 0.42;
+}
+
+.todayDay {
+  border-color: rgba(47, 143, 91, 0.42);
+}
+
+.selectedDay {
+  border-color: var(--green);
+  box-shadow: inset 0 0 0 1px var(--green);
+  background: var(--mint);
+}
+
+.selectedDay span,
+.selectedDay i {
+  color: var(--green-dark);
+}
+
+.selectedDayCompact {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 12px;
+  align-items: center;
+  margin: 10px 0;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+}
+
+.selectedDayCompact div {
+  display: grid;
+  gap: 5px;
+}
+
+.selectedDayCompact span {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.selectedDayCompact strong {
+  font-size: 18px;
+}
+
+.selectedDayCompact p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.observationGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.observationMetric {
+  display: grid;
+  gap: 8px;
+  min-height: auto;
+  padding: 13px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+}
+
+.observationMetric span,
+.foodTrend span {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.observationMetric strong {
+  font-size: 19px;
+}
+
+.foodTrend {
+  display: grid;
+  gap: 10px;
+  margin-top: 12px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+}
+
+.foodTrend div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.foodTrend b {
+  padding: 7px 10px;
+  color: var(--green-dark);
+  border-radius: 999px;
+  background: var(--mint);
+  font-size: 13px;
+}
+
+.foodTrend em {
+  color: var(--muted);
+  font-size: 14px;
+  font-style: normal;
+}
+
+.nextMealCard {
+  display: grid;
+  gap: 14px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+}
+
+.nextMealCard > div:first-child {
+  display: grid;
+  gap: 8px;
+}
+
+.nextMealCard span {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.nextMealCard strong {
+  font-size: 24px;
+}
+
+.nextMealCard p {
+  margin: 0;
+  color: #4e5c52;
+  line-height: 1.65;
+}
+
+.nextMealTags {
+  display: flex;
+  flex-wrap: wrap;
+  align-content: center;
+  gap: 8px;
+}
+
+.nextMealTags b {
+  padding: 8px 10px;
+  color: var(--green-dark);
+  border-radius: 999px;
+  background: var(--mint);
+  font-size: 13px;
+}
+
+.toast {
+  position: fixed;
+  z-index: 10;
+  top: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 10px 14px;
+  color: #fff;
+  border-radius: 999px;
+  background: rgba(23, 98, 60, 0.95);
+  box-shadow: 0 12px 32px rgba(23, 98, 60, 0.22);
+  font-size: 14px;
+  font-weight: 800;
+}
+
+@media (max-width: 820px) {
+  .uploadGrid,
+  .mealList,
+  .insightGrid,
+  .analysisStats,
+  .analysisGrid,
+  .keyForm,
+  .textMealActions,
+  .profileForm,
+  .observationGrid,
+  .nextMealCard {
+    grid-template-columns: 1fr;
+  }
+
+  .calendarHeader {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .calendarHeader strong {
+    grid-column: 1 / -1;
+    grid-row: 1;
+  }
+
+  .mealCard {
+    min-height: auto;
+  }
+
+  .nutrientEditGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 520px) {
+  .shell {
+    padding: 18px 12px 32px;
+  }
+
+  .hero p {
+    font-size: 16px;
+  }
+
+  .panel {
+    padding: 15px;
+  }
+
+  .sectionTitle h2 {
+    font-size: 21px;
+  }
+
+  .uploadBox,
+  .uploadBox img,
+  .recognitionCard {
+    min-height: 280px;
+  }
+
+  .mealContextGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .calendarPanel {
+    padding: 10px;
+  }
+
+  .weekHeader,
+  .calendarGrid,
+  .weekCalendarGrid {
+    gap: 4px;
+  }
+
+  .calendarDay {
+    min-height: 62px;
+    padding: 6px;
+  }
+
+  .calendarDay b {
+    font-size: 12px;
+  }
+
+  .calendarDay i {
+    font-size: 10px;
+  }
+
+  .recordMeta,
+  .editActions,
+  .heroActions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .recordMeta button,
+  .secondaryButton,
+  .primarySmallButton,
+  .dangerButton,
+  .keyPanelHead button,
+  .keyForm button,
+  .heroActions button {
+    width: 100%;
+  }
+
+  .keyPanelHead {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .profileHeader {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .profileHeader button {
+    width: 100%;
+  }
+}
