@@ -99,89 +99,6 @@
   cursor: pointer;
 }
 
-.keyPanel {
-  margin: 0 0 16px;
-  padding: 14px;
-  border: 1px solid rgba(47, 143, 91, 0.18);
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.78);
-  box-shadow: 0 12px 30px rgba(30, 63, 42, 0.07);
-}
-
-.keyPanelHead {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-}
-
-.keyPanelHead div {
-  display: grid;
-  gap: 5px;
-}
-
-.keyPanelHead span {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  color: var(--green-dark);
-  font-size: 13px;
-  font-weight: 800;
-}
-
-.keyPanelHead strong {
-  font-size: 15px;
-}
-
-.keyPanelHead button,
-.keyForm button {
-  min-height: 40px;
-  padding: 0 14px;
-  color: #fff;
-  border-radius: 8px;
-  background: var(--green);
-  font-weight: 800;
-  cursor: pointer;
-}
-
-.keyForm {
-  display: grid;
-  grid-template-columns: 1fr auto auto auto;
-  gap: 10px;
-  margin-top: 12px;
-}
-
-.keyForm input {
-  min-width: 0;
-  height: 42px;
-  padding: 0 12px;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  color: var(--ink);
-  background: #fff;
-  outline: none;
-}
-
-.keyForm .clearKeyButton {
-  color: var(--green-dark);
-  border: 1px solid var(--line);
-  background: #fff;
-}
-
-.keyForm .testKeyButton {
-  color: var(--green-dark);
-  border: 1px solid rgba(47, 143, 91, 0.28);
-  background: var(--mint);
-}
-
-.keyTestStatus {
-  margin: 10px 0 0;
-  color: var(--muted);
-  font-size: 13px;
-  font-weight: 800;
-  line-height: 1.5;
-}
-
 .profilePanel {
   margin: 0 0 16px;
   padding: 16px;
@@ -1271,7 +1188,6 @@
   .insightGrid,
   .analysisStats,
   .analysisGrid,
-  .keyForm,
   .textMealActions,
   .profileForm,
   .observationGrid,
@@ -1358,15 +1274,8 @@
   .secondaryButton,
   .primarySmallButton,
   .dangerButton,
-  .keyPanelHead button,
-  .keyForm button,
   .heroActions button {
     width: 100%;
-  }
-
-  .keyPanelHead {
-    align-items: stretch;
-    flex-direction: column;
   }
 
   .profileHeader {

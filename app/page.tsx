@@ -7,7 +7,6 @@ import {
   ChevronRight,
   Clock3,
   Edit3,
-  KeyRound,
   Loader2,
   Mic,
   UserRound,
@@ -343,10 +342,6 @@ export default function Home() {
   const [textMeal, setTextMeal] = useState("");
   const [isTextEstimating, setIsTextEstimating] = useState(false);
   const [isListening, setIsListening] = useState(false);
-  const [kimiKeyInput, setKimiKeyInput] = useState("");
-  const [hasBrowserKimiKey, setHasBrowserKimiKey] = useState(false);
-  const [showKeyPanel, setShowKeyPanel] = useState(false);
-  const [keyTestStatus, setKeyTestStatus] = useState("");
   const [records, setRecords] = useState<MealRecord[]>([]);
   const [profile, setProfile] = useState<UserProfile>(emptyProfile);
   const [showProfilePanel, setShowProfilePanel] = useState(false);
@@ -369,7 +364,6 @@ export default function Home() {
     if (savedProfile) {
       setProfile({ ...emptyProfile, ...(JSON.parse(savedProfile) as UserProfile) });
     }
-    setHasBrowserKimiKey(Boolean(window.localStorage.getItem("chileme-kimi-key")));
   }, []);
 
   useEffect(() => {
@@ -411,10 +405,6 @@ export default function Home() {
   const macrosTotal = Math.max(totals.protein + totals.carbs + totals.fat, 1);
   const averageDailyCalories = observedDayCount ? Math.round(observedTotals.calories / observedDayCount) : 0;
 
-  function getBrowserKimiKey() {
-    return window.localStorage.getItem("chileme-kimi-key") || "";
-  }
-
   function scrollToUpload() {
     uploadSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   }
@@ -448,12 +438,10 @@ export default function Home() {
   }
 
   async function estimateByText(description: string) {
-    const browserKimiKey = getBrowserKimiKey();
     const response = await fetch("/api/estimate", {
       method: "POST",
       headers: {
-        "Content-Type": "application/json",
-        ...(browserKimiKey ? { "x-kimi-api-key": browserKimiKey } : {})
+        "Content-Type": "application/json"
       },
       body: JSON.stringify({ description, profileContext })
     });
@@ -479,12 +467,10 @@ export default function Home() {
       setIsRecognizing(true);
 
       try {
-        const browserKimiKey = getBrowserKimiKey();
         const response = await fetch("/api/recognize", {
           method: "POST",
           headers: {
-            "Content-Type": "application/json",
-            ...(browserKimiKey ? { "x-kimi-api-key": browserKimiKey } : {})
+            "Content-Type": "application/json"
           },
           body: JSON.stringify({ imageDataUrl, profileContext })
         });
@@ -496,9 +482,6 @@ export default function Home() {
           keyTail?: string;
         };
         if (!response.ok || !data.result) {
-          if (response.status === 401 || response.status === 503 || data.error?.includes("访问码")) {
-            setShowKeyPanel(true);
-          }
           setRecognitionDebug("");
           throw new Error(data.error || "智能分析暂时不可用，请稍后再试。");
         }
@@ -560,57 +543,6 @@ export default function Home() {
     recognition.onend = () => setIsListening(false);
     setIsListening(true);
     recognition.start();
-  }
-
-  function saveKimiKey() {
-    const cleanedKey = kimiKeyInput.replace(/^Bearer\s+/i, "").trim();
-    if (!cleanedKey) {
-      setToast("请先填写访问码");
-      return;
-    }
-    window.localStorage.setItem("chileme-kimi-key", cleanedKey);
-    setKimiKeyInput("");
-    setHasBrowserKimiKey(true);
-    setShowKeyPanel(false);
-    setKeyTestStatus("");
-    setRecognitionError("");
-    setToast("访问码已保存");
-  }
-
-  function clearKimiKey() {
-    window.localStorage.removeItem("chileme-kimi-key");
-    setHasBrowserKimiKey(false);
-    setKimiKeyInput("");
-    setKeyTestStatus("");
-    setToast("访问码已清除");
-  }
-
-  async function testKimiKey() {
-    const savedKey = window.localStorage.getItem("chileme-kimi-key") || "";
-    const keyToTest = kimiKeyInput.replace(/^Bearer\s+/i, "").trim() || savedKey;
-    if (!keyToTest) {
-      setToast("请先填写或保存访问码");
-      return;
-    }
-
-    setKeyTestStatus("正在检查是否可用...");
-    try {
-      const response = await fetch("/api/test-key", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-kimi-api-key": keyToTest
-        }
-      });
-      const data = (await response.json()) as { ok?: boolean; error?: string; keyTail?: string };
-      setKeyTestStatus(
-        data.ok
-          ? "已准备好，可以开始智能分析。"
-          : `${data.error || "暂时不可用，请稍后再试。"}`
-      );
-    } catch {
-      setKeyTestStatus("暂时不可用，请检查网络或稍后重试。");
-    }
   }
 
   function createRecord() {
@@ -696,44 +628,6 @@ export default function Home() {
         <button className={styles.iconButton} type="button" onClick={resetDemo} aria-label="清空今日记录">
           <RotateCcw size={18} />
         </button>
-      </section>
-
-      <section className={styles.keyPanel}>
-        <div className={styles.keyPanelHead}>
-          <div>
-            <span>
-              <KeyRound size={16} />
-              智能分析
-            </span>
-            <strong>{hasBrowserKimiKey ? "智能分析已开启" : "需要开启后才能分析图片和文字"}</strong>
-          </div>
-          <button type="button" onClick={() => setShowKeyPanel((current) => !current)}>
-            {showKeyPanel ? "收起" : hasBrowserKimiKey ? "更换" : "开启"}
-          </button>
-        </div>
-        {showKeyPanel ? (
-          <div className={styles.keyForm}>
-            <input
-              type="password"
-              value={kimiKeyInput}
-              onChange={(event) => setKimiKeyInput(event.target.value)}
-              placeholder="填写访问码"
-              autoComplete="off"
-            />
-            <button type="button" onClick={saveKimiKey}>
-              保存并隐藏
-            </button>
-            <button type="button" className={styles.testKeyButton} onClick={testKimiKey}>
-              检查可用
-            </button>
-            {hasBrowserKimiKey ? (
-              <button type="button" className={styles.clearKeyButton} onClick={clearKimiKey}>
-                清除
-              </button>
-            ) : null}
-          </div>
-        ) : null}
-        {keyTestStatus ? <p className={styles.keyTestStatus}>{keyTestStatus}</p> : null}
       </section>
 
       <section className={styles.profilePanel}>
@@ -950,10 +844,7 @@ export default function Home() {
                 <X size={28} />
                 <strong>{recognitionError}</strong>
                 {recognitionDebug ? <small>{recognitionDebug}</small> : null}
-                <span>智能分析暂时不可用，可以稍后再试，或检查访问码是否可用。</span>
-                <button type="button" onClick={() => setShowKeyPanel(true)}>
-                  打开设置
-                </button>
+                <span>智能分析暂时不可用，可以稍后再试，或先用文字手动记录这一餐。</span>
               </div>
             ) : (
               <div className={styles.idleState}>

@@ -53,7 +53,6 @@ async function seed(page) {
     ({ records, profile }) => {
       window.localStorage.setItem("chileme-records", JSON.stringify(records));
       window.localStorage.setItem("chileme-profile", JSON.stringify(profile));
-      window.localStorage.setItem("chileme-kimi-key", "verify-only-key");
     },
     { records: seededRecords, profile: seededProfile }
   );
