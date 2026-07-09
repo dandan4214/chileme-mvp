@@ -572,7 +572,6 @@
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  margin-bottom: 12px;
 }
 
 .moodPicker button {
@@ -1129,6 +1128,22 @@
   border: 1px solid var(--line);
   border-radius: 8px;
   background: #fff;
+}
+
+.nextMealMood {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 12px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fbfdfb;
+}
+
+.nextMealMood > span {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 800;
 }
 
 .nextMealCard > div:first-child {

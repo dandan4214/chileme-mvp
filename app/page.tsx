@@ -552,7 +552,6 @@ export default function Home() {
       id: `${Date.now()}`,
       slot: selectedSlot,
       scene: selectedScene,
-      mood: selectedMood,
       createdAt: new Date().toISOString()
     };
     setRecords((current) => [record, ...current]);
@@ -820,18 +819,6 @@ export default function Home() {
                     </select>
                   </label>
                 </div>
-                <div className={styles.moodPicker} aria-label="饭点状态">
-                  {mealMoods.map((mood) => (
-                    <button
-                      key={mood}
-                      type="button"
-                      className={selectedMood === mood ? styles.activeMood : ""}
-                      onClick={() => setSelectedMood(mood)}
-                    >
-                      {mood}
-                    </button>
-                  ))}
-                </div>
                 <div className={styles.actions}>
                   <button type="button" onClick={createRecord}>
                     <Plus size={18} />
@@ -981,9 +968,24 @@ export default function Home() {
             </div>
             <Clock3 size={22} />
           </div>
+          <div className={styles.nextMealMood}>
+            <span>下一餐状态</span>
+            <div className={styles.moodPicker} aria-label="下一餐状态">
+              {mealMoods.map((mood) => (
+                <button
+                  key={mood}
+                  type="button"
+                  className={selectedMood === mood ? styles.activeMood : ""}
+                  onClick={() => setSelectedMood(mood)}
+                >
+                  {mood}
+                </button>
+              ))}
+            </div>
+          </div>
           <div className={styles.nextMealCard}>
             <div>
-              <span>基于今日记录和当前状态</span>
+              <span>基于今日记录和下一餐状态</span>
               <strong>{nextMealIdea.title}</strong>
               <p>{nextMealIdea.tip}</p>
             </div>

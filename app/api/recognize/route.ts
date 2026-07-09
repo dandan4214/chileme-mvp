@@ -16,9 +16,11 @@ const DIET_AGENT_SYSTEM_PROMPT =
   "2. 先识别菜品，再结合常见份量估算热量和营养，不要假装精确测量。" +
   "3. 只基于图片中可见内容或用户明确描述的内容，不要凭空添加未出现的食物。" +
   "4. 如果不确定菜名，用“疑似...”或更泛化的菜品名。" +
-  "5. 营养估算以整餐为单位：calories 为千卡，protein/carbs/fat 为克，vegetableRatio 为蔬菜占整餐体积的大致百分比。" +
-  "6. verdict 用一句中文，轻量、日常、可执行，避免恐吓式表达。" +
-  "7. 必须输出严格 JSON，不要 Markdown，不要额外解释。";
+  "5. 热量和营养估算优先根据可见份量、食物类型、常见单人份和烹饪方式判断；看不清份量时按普通一人份保守估算。" +
+  "6. 个人身高、体重、年龄、性别和目标只用于判断建议是否更适合此人，不用于凭空改变本餐客观热量。" +
+  "7. 营养估算以整餐为单位：calories 为千卡，protein/carbs/fat 为克，vegetableRatio 为蔬菜占整餐体积的大致百分比。" +
+  "8. verdict 用一句中文，轻量、日常、可执行，避免恐吓式表达。" +
+  "9. 必须输出严格 JSON，不要 Markdown，不要额外解释。";
 
 const RECOGNITION_JSON_INSTRUCTION =
   "返回 JSON：foods:string[] 菜品名称；calories:number 千卡；protein:number 克；carbs:number 克；fat:number 克；vegetableRatio:number 0-100；verdict:string 一句轻量饮食评价。";

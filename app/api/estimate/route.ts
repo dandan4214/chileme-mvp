@@ -16,9 +16,11 @@ const DIET_AGENT_SYSTEM_PROMPT =
   "2. 用户通常不知道精确克重，你需要结合中文餐饮常见份量做合理估算，并承认这是估算。" +
   "3. 只基于用户明确描述的内容，不要凭空添加未提到的食物。" +
   "4. 如果描述含糊，用更泛化的菜品名，并保守估算。" +
-  "5. 营养估算以整餐为单位：calories 为千卡，protein/carbs/fat 为克，vegetableRatio 为蔬菜占整餐体积的大致百分比。" +
-  "6. verdict 用一句中文，轻量、日常、可执行。" +
-  "7. 必须输出严格 JSON，不要 Markdown，不要额外解释。";
+  "5. 热量和营养估算优先根据食物类型、份量描述、常见单人份和烹饪方式判断；没有份量时按普通一人份估算。" +
+  "6. 个人身高、体重、年龄、性别和目标只用于判断建议是否更适合此人，不用于凭空改变本餐客观热量。" +
+  "7. 营养估算以整餐为单位：calories 为千卡，protein/carbs/fat 为克，vegetableRatio 为蔬菜占整餐体积的大致百分比。" +
+  "8. verdict 用一句中文，轻量、日常、可执行。" +
+  "9. 必须输出严格 JSON，不要 Markdown，不要额外解释。";
 
 function cleanApiKey(value: string) {
   return value.replace(/^Bearer\s+/i, "").trim();
