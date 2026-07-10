@@ -30,7 +30,6 @@ import { ChangeEvent, useEffect, useMemo, useRef, useState } from "react";
 import styles from "./page.module.css";
 
 type MealSlot = "早餐" | "午餐" | "晚餐" | "加餐";
-type MealScene = "自己做" | "点外卖" | "到店吃";
 type MealMood = "正常吃" | "赶时间" | "想省钱" | "减脂中" | "想奖励自己";
 
 type Recognition = {
@@ -46,7 +45,6 @@ type Recognition = {
 type MealRecord = Recognition & {
   id: string;
   slot: MealSlot;
-  scene?: MealScene;
   mood?: MealMood;
   createdAt: string;
 };
@@ -84,7 +82,6 @@ type SpeechWindow = Window &
   };
 
 const mealSlots: MealSlot[] = ["早餐", "午餐", "晚餐", "加餐"];
-const mealScenes: MealScene[] = ["自己做", "点外卖", "到店吃"];
 const mealMoods: MealMood[] = ["正常吃", "赶时间", "想省钱", "减脂中", "想奖励自己"];
 const needOptions = ["最近在健身", "最近想减肥", "想少油清淡", "想规律吃饭", "想多补蛋白", "控制夜宵"];
 
@@ -253,6 +250,18 @@ function buildProfileContext(profile: UserProfile) {
   return parts.length ? parts.join("；") : "用户暂未填写个人饮食背景。";
 }
 
+function hasProfileInfo(profile: UserProfile) {
+  return Boolean(
+    profile.name.trim() ||
+    profile.height.trim() ||
+    profile.weight.trim() ||
+    profile.age.trim() ||
+    (profile.gender && profile.gender !== "未设置") ||
+    profile.needs.length ||
+    profile.customNeed.trim()
+  );
+}
+
 function getTopFoods(records: MealRecord[]) {
   const counts = records.reduce<Record<string, number>>((acc, record) => {
     record.foods.forEach((food) => {
@@ -265,17 +274,6 @@ function getTopFoods(records: MealRecord[]) {
     .sort((a, b) => b[1] - a[1])
     .slice(0, 4)
     .map(([food]) => food);
-}
-
-function getTopScene(records: MealRecord[]) {
-  const counts = records.reduce<Record<string, number>>((acc, record) => {
-    if (record.scene) {
-      acc[record.scene] = (acc[record.scene] || 0) + 1;
-    }
-    return acc;
-  }, {});
-  const top = Object.entries(counts).sort((a, b) => b[1] - a[1])[0];
-  return top ? top[0] : "待累计";
 }
 
 function buildNextMealIdea(records: MealRecord[], profile: UserProfile, mood: MealMood) {
@@ -400,7 +398,6 @@ export default function Home() {
   const [calendarCursor, setCalendarCursor] = useState(() => new Date());
   const [selectedDateKey, setSelectedDateKey] = useState(() => getDateKey(new Date()));
   const [selectedSlot, setSelectedSlot] = useState<MealSlot>("午餐");
-  const [selectedScene, setSelectedScene] = useState<MealScene>("点外卖");
   const [selectedMood, setSelectedMood] = useState<MealMood>("正常吃");
   const [toast, setToast] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -411,12 +408,16 @@ export default function Home() {
     if (saved) {
       setRecords(JSON.parse(saved) as MealRecord[]);
     }
+    let restoredProfile = emptyProfile;
     const savedProfile = window.localStorage.getItem("chileme-profile");
     if (savedProfile) {
-      setProfile({ ...emptyProfile, ...(JSON.parse(savedProfile) as UserProfile) });
+      restoredProfile = { ...emptyProfile, ...(JSON.parse(savedProfile) as UserProfile) };
+      setProfile(restoredProfile);
     }
     const seenOnboarding = window.localStorage.getItem("chileme-onboarding-seen");
-    if (!seenOnboarding) {
+    if (hasProfileInfo(restoredProfile)) {
+      window.localStorage.setItem("chileme-onboarding-seen", "true");
+    } else if (!seenOnboarding) {
       setShowOnboarding(true);
     }
   }, []);
@@ -446,7 +447,6 @@ export default function Home() {
   const observedTotals = useMemo(() => getTotals(observedRecords), [observedRecords]);
   const observedDayCount = useMemo(() => getRecordedDayCount(observedRecords), [observedRecords]);
   const topFoods = useMemo(() => getTopFoods(observedRecords), [observedRecords]);
-  const topScene = useMemo(() => getTopScene(observedRecords), [observedRecords]);
   const nextMealIdea = useMemo(() => buildNextMealIdea(todayRecords, profile, selectedMood), [todayRecords, profile, selectedMood]);
   const profileContext = useMemo(() => buildProfileContext(profile), [profile]);
   const recordsByDate = useMemo(() => getRecordsByDate(records), [records]);
@@ -479,32 +479,25 @@ export default function Home() {
     uploadSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
-  function finishOnboarding() {
-    window.localStorage.setItem("chileme-profile", JSON.stringify(profile));
+  function markOnboardingSeen() {
     window.localStorage.setItem("chileme-onboarding-seen", "true");
     setShowOnboarding(false);
-    setShowProfilePanel(false);
-    setActiveTab("record");
-    setToast("个人档案已保存，可以开始记录了");
   }
 
   function skipOnboarding() {
-    window.localStorage.setItem("chileme-onboarding-seen", "true");
-    setShowOnboarding(false);
+    markOnboardingSeen();
     setShowProfilePanel(false);
   }
 
   function openProfileFromGuide() {
+    markOnboardingSeen();
     setActiveTab("profile");
     setShowProfilePanel(true);
   }
 
   function saveProfile() {
     window.localStorage.setItem("chileme-profile", JSON.stringify(profile));
-    if (showOnboarding) {
-      finishOnboarding();
-      return;
-    }
+    markOnboardingSeen();
     setShowProfilePanel(false);
     setToast("个人档案已保存");
   }
@@ -512,6 +505,7 @@ export default function Home() {
   function handleTabChange(tab: AppTab) {
     setActiveTab(tab);
     if (tab === "profile") {
+      if (showOnboarding) markOnboardingSeen();
       setShowProfilePanel(true);
     }
   }
@@ -662,7 +656,6 @@ export default function Home() {
       ...recognition,
       id: `${Date.now()}`,
       slot: selectedSlot,
-      scene: selectedScene,
       createdAt: new Date().toISOString()
     };
     setRecords((current) => [record, ...current]);
@@ -833,14 +826,6 @@ export default function Home() {
                     <select value={selectedSlot} onChange={(event) => setSelectedSlot(event.target.value as MealSlot)}>
                       {mealSlots.map((slot) => (
                         <option key={slot}>{slot}</option>
-                      ))}
-                    </select>
-                  </label>
-                  <label>
-                    场景
-                    <select value={selectedScene} onChange={(event) => setSelectedScene(event.target.value as MealScene)}>
-                      {mealScenes.map((scene) => (
-                        <option key={scene}>{scene}</option>
                       ))}
                     </select>
                   </label>
@@ -1072,7 +1057,7 @@ export default function Home() {
           <div className={styles.observationGrid}>
             <ObservationMetric label="记录天数" value={`${observedDayCount} 天`} />
             <ObservationMetric label="日均热量" value={`${averageDailyCalories} kcal`} />
-            <ObservationMetric label="主要场景" value={topScene} />
+            <ObservationMetric label="记录餐数" value={`${observedRecords.length} 餐`} />
           </div>
         </div>
         ) : null}
@@ -1096,7 +1081,7 @@ export default function Home() {
           </button>
         </div>
 
-        {showOnboarding ? (
+        {!hasProfileInfo(profile) ? (
           <div className={styles.profileWelcome}>
             <UserRound size={20} />
             <div>
@@ -1173,7 +1158,7 @@ export default function Home() {
             <div className={styles.profileActions}>
               <button type="button" onClick={saveProfile}>
                 <Save size={16} />
-                {showOnboarding ? "保存并开始记录" : "保存个人档案"}
+                保存个人档案
               </button>
             </div>
           </div>
@@ -1311,7 +1296,6 @@ function EditableRecord({
   const [isReestimating, setIsReestimating] = useState(false);
   const [draft, setDraft] = useState({
     slot: record.slot,
-    scene: record.scene || "点外卖",
     mood: record.mood || "正常吃",
     foods: record.foods.join("、"),
     verdict: record.verdict
@@ -1320,7 +1304,6 @@ function EditableRecord({
   useEffect(() => {
     setDraft({
       slot: record.slot,
-      scene: record.scene || "点外卖",
       mood: record.mood || "正常吃",
       foods: record.foods.join("、"),
       verdict: record.verdict
@@ -1332,7 +1315,6 @@ function EditableRecord({
     onUpdate({
       ...record,
       slot: draft.slot,
-      scene: draft.scene,
       mood: draft.mood,
       foods: foods.length ? foods : record.foods,
       verdict: draft.verdict.trim() || record.verdict
@@ -1358,7 +1340,6 @@ function EditableRecord({
         <div>
           <b>{record.foods.join("、")}</b>
           <div className={styles.recordChips}>
-            {record.scene ? <i>{record.scene}</i> : null}
             {record.mood ? <i>{record.mood}</i> : null}
           </div>
           <span>{record.verdict}</span>
@@ -1381,14 +1362,6 @@ function EditableRecord({
         <select value={draft.slot} onChange={(event) => setDraft({ ...draft, slot: event.target.value as MealSlot })}>
           {mealSlots.map((slot) => (
             <option key={slot}>{slot}</option>
-          ))}
-        </select>
-      </label>
-      <label>
-        场景
-        <select value={draft.scene} onChange={(event) => setDraft({ ...draft, scene: event.target.value as MealScene })}>
-          {mealScenes.map((scene) => (
-            <option key={scene}>{scene}</option>
           ))}
         </select>
       </label>

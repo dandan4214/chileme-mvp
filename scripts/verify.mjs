@@ -10,7 +10,6 @@ const seededRecords = [
   {
     id: "verify-lunch",
     slot: "午餐",
-    scene: "自己做",
     mood: "正常吃",
     foods: ["蛋炒饭", "无糖豆浆"],
     calories: 720,
@@ -24,7 +23,6 @@ const seededRecords = [
   {
     id: "verify-snack",
     slot: "加餐",
-    scene: "点外卖",
     mood: "想奖励自己",
     foods: ["酸奶", "坚果"],
     calories: 260,
@@ -102,6 +100,14 @@ const onboardingBefore = await onboarding.locator("body").innerText();
 await onboarding.screenshot({ path: "verification-onboarding.png", fullPage: false });
 await onboarding.getByRole("button", { name: "去“我的”填写" }).click();
 const onboardingAfter = await onboarding.locator("body").innerText();
+const onboardingReturned = await clickTab(onboarding, "我的记录");
+
+const returningProfile = await browser.newPage({ viewport: { width: 390, height: 900 }, isMobile: true });
+await returningProfile.addInitScript((profile) => {
+  window.localStorage.setItem("chileme-profile", JSON.stringify(profile));
+}, seededProfile);
+await returningProfile.goto(appUrl, { waitUntil: "networkidle" });
+const returningProfileText = await returningProfile.locator("body").innerText();
 
 await browser.close();
 
@@ -127,7 +133,9 @@ const result = {
   },
   onboarding: {
     hasGuide: onboardingBefore.includes("先完善个人档案") && onboardingBefore.includes("饮食建议更适合你"),
-    opensProfile: onboardingAfter.includes("完善个人档案") && onboardingAfter.includes("保存并开始记录")
+    opensProfile: onboardingAfter.includes("完善个人档案") && onboardingAfter.includes("保存个人档案"),
+    staysDismissed: !onboardingReturned.includes("第一次使用"),
+    existingProfileSkips: !returningProfileText.includes("第一次使用")
   }
 };
 
@@ -150,6 +158,8 @@ if (
   !result.mobile.hasProfile ||
   !result.onboarding.hasGuide ||
   !result.onboarding.opensProfile ||
+  !result.onboarding.staysDismissed ||
+  !result.onboarding.existingProfileSkips ||
   result.mobile.errors.length
 ) {
   process.exit(1);
