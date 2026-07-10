@@ -53,9 +53,16 @@ async function seed(page) {
     ({ records, profile }) => {
       window.localStorage.setItem("chileme-records", JSON.stringify(records));
       window.localStorage.setItem("chileme-profile", JSON.stringify(profile));
+      window.localStorage.setItem("chileme-onboarding-seen", "true");
     },
     { records: seededRecords, profile: seededProfile }
   );
+}
+
+async function clickTab(page, label) {
+  await page.getByRole("navigation", { name: "应用板块" }).getByRole("button", { name: label }).click();
+  await page.waitForTimeout(120);
+  return page.locator("body").innerText();
 }
 
 const desktop = await browser.newPage({ viewport: { width: 1280, height: 980 } });
@@ -65,9 +72,12 @@ desktop.on("console", (msg) => {
 });
 await seed(desktop);
 await desktop.goto(appUrl, { waitUntil: "networkidle" });
-await desktop.getByRole("button", { name: /填入示例/ }).first().click();
-const desktopText = await desktop.locator("body").innerText();
+await desktop.getByRole("button", { name: /示例/ }).first().click();
+const desktopRecordText = await desktop.locator("body").innerText();
 const sampleText = await desktop.locator("textarea").first().inputValue();
+const desktopTodayText = await clickTab(desktop, "今日");
+const desktopObserveText = await clickTab(desktop, "观察");
+const desktopNextText = await clickTab(desktop, "下一餐");
 await desktop.screenshot({ path: "verification-desktop.png", fullPage: true });
 
 const mobile = await browser.newPage({ viewport: { width: 390, height: 900 }, isMobile: true });
@@ -77,28 +87,29 @@ mobile.on("console", (msg) => {
 });
 await seed(mobile);
 await mobile.goto(appUrl, { waitUntil: "networkidle" });
-const mobileText = await mobile.locator("body").innerText();
+const mobileRecordText = await mobile.locator("body").innerText();
+const mobileTodayText = await clickTab(mobile, "今日");
+const mobileObserveText = await clickTab(mobile, "观察");
 await mobile.screenshot({ path: "verification-mobile.png", fullPage: true });
 
 await browser.close();
 
 const result = {
   desktop: {
-    hasContent: desktopText.includes("吃了么"),
-    hasInsightPanel: desktopText.includes("每日食物观察") && desktopText.includes("下一餐方向"),
-    hasSnack: desktopText.includes("加餐") && desktopText.includes("酸奶"),
-    hasNextMeal: desktopText.includes("下一餐方向"),
-    hasCalendar: desktopText.includes("今天") && desktopText.includes("常出现食物"),
-    hasBottomStats: desktopText.includes("今日总热量") && desktopText.includes("结构评分") && desktopText.includes("蔬菜占比"),
-    hasProfileNeed: desktopText.includes("最近在健身"),
+    hasContent: desktopRecordText.includes("吃了么"),
+    hasRecordAgent: desktopRecordText.includes("记录这一餐") && desktopRecordText.includes("上传餐食图片"),
+    hasSnack: desktopTodayText.includes("加餐") && desktopTodayText.includes("酸奶"),
+    hasAnalysis: desktopTodayText.includes("今日营养结构") && desktopTodayText.includes("当前浏览器"),
+    hasCalendar: desktopObserveText.includes("每日食物观察") && desktopObserveText.includes("常出现食物"),
+    hasNextMeal: desktopNextText.includes("下一餐方向") && desktopNextText.includes("下一餐状态"),
     sampleFilled: sampleText.includes("午餐吃了蛋炒饭一盘"),
     errors
   },
   mobile: {
-    hasContent: mobileText.includes("吃了么"),
-    hasUpload: mobileText.includes("上传餐食图片") || mobileText.includes("记录这一餐"),
-    hasCalendar: mobileText.includes("每日食物观察") && mobileText.includes("常出现食物"),
-    hasLocalNote: mobileText.includes("当前浏览器"),
+    hasContent: mobileRecordText.includes("吃了么"),
+    hasUpload: mobileRecordText.includes("上传餐食图片") || mobileRecordText.includes("记录这一餐"),
+    hasToday: mobileTodayText.includes("今天已经记录的餐食") && mobileTodayText.includes("当前浏览器"),
+    hasCalendar: mobileObserveText.includes("每日食物观察") && mobileObserveText.includes("常出现食物"),
     errors: mobileErrors
   }
 };
@@ -107,18 +118,17 @@ console.log(JSON.stringify(result, null, 2));
 
 if (
   !result.desktop.hasContent ||
-  !result.desktop.hasInsightPanel ||
+  !result.desktop.hasRecordAgent ||
   !result.desktop.hasSnack ||
+  !result.desktop.hasAnalysis ||
   !result.desktop.hasNextMeal ||
   !result.desktop.hasCalendar ||
-  !result.desktop.hasBottomStats ||
-  !result.desktop.hasProfileNeed ||
   !result.desktop.sampleFilled ||
   result.desktop.errors.length ||
   !result.mobile.hasContent ||
   !result.mobile.hasUpload ||
+  !result.mobile.hasToday ||
   !result.mobile.hasCalendar ||
-  !result.mobile.hasLocalNote ||
   result.mobile.errors.length
 ) {
   process.exit(1);

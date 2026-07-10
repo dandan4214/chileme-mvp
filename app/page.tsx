@@ -3,6 +3,7 @@
 import {
   Activity,
   Camera,
+  CalendarDays,
   Check,
   ChevronRight,
   Clock3,
@@ -21,6 +22,7 @@ import {
   Utensils,
   X
 } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import { ChangeEvent, useEffect, useMemo, useRef, useState } from "react";
 import styles from "./page.module.css";
 
@@ -59,6 +61,7 @@ type UserProfile = {
 
 type ObservationRange = "week" | "month";
 type RecognitionStage = "idle" | "uploading" | "recognizing" | "returning";
+type AppTab = "record" | "today" | "observe" | "next";
 
 type SpeechRecognitionConstructor = new () => {
   lang: string;
@@ -375,6 +378,7 @@ async function compressMealImage(file: File) {
 }
 
 export default function Home() {
+  const [activeTab, setActiveTab] = useState<AppTab>("record");
   const [preview, setPreview] = useState<string | null>(null);
   const [isRecognizing, setIsRecognizing] = useState(false);
   const [recognitionStage, setRecognitionStage] = useState<RecognitionStage>("idle");
@@ -388,6 +392,7 @@ export default function Home() {
   const [records, setRecords] = useState<MealRecord[]>([]);
   const [profile, setProfile] = useState<UserProfile>(emptyProfile);
   const [showProfilePanel, setShowProfilePanel] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(false);
   const [observationRange, setObservationRange] = useState<ObservationRange>("week");
   const [calendarCursor, setCalendarCursor] = useState(() => new Date());
   const [selectedDateKey, setSelectedDateKey] = useState(() => getDateKey(new Date()));
@@ -406,6 +411,11 @@ export default function Home() {
     const savedProfile = window.localStorage.getItem("chileme-profile");
     if (savedProfile) {
       setProfile({ ...emptyProfile, ...(JSON.parse(savedProfile) as UserProfile) });
+    }
+    const seenOnboarding = window.localStorage.getItem("chileme-onboarding-seen");
+    if (!seenOnboarding) {
+      setShowOnboarding(true);
+      setShowProfilePanel(true);
     }
   }, []);
 
@@ -454,9 +464,29 @@ export default function Home() {
   ];
   const activeRecognitionStepIndex = Math.max(0, recognitionSteps.findIndex((step) => step.key === recognitionStage));
   const activeRecognitionStep = recognitionSteps.find((step) => step.key === recognitionStage) || recognitionSteps[0];
+  const appTabs: Array<{ key: AppTab; label: string; icon: LucideIcon }> = [
+    { key: "record", label: "记录", icon: Camera },
+    { key: "today", label: "今日", icon: Check },
+    { key: "observe", label: "观察", icon: CalendarDays },
+    { key: "next", label: "下一餐", icon: Clock3 }
+  ];
 
   function scrollToUpload() {
+    setActiveTab("record");
     uploadSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  function finishOnboarding() {
+    window.localStorage.setItem("chileme-onboarding-seen", "true");
+    setShowOnboarding(false);
+    setShowProfilePanel(false);
+    setActiveTab("record");
+  }
+
+  function skipOnboarding() {
+    window.localStorage.setItem("chileme-onboarding-seen", "true");
+    setShowOnboarding(false);
+    setShowProfilePanel(false);
   }
 
   function fillSampleText() {
@@ -672,9 +702,9 @@ export default function Home() {
               <Camera size={17} />
               开始记录
             </button>
-            <button type="button" onClick={fillSampleText}>
-              <Sparkles size={17} />
-              填入示例
+            <button type="button" onClick={() => setShowProfilePanel((current) => !current)}>
+              <UserRound size={17} />
+              个人档案
             </button>
           </div>
         </div>
@@ -683,6 +713,32 @@ export default function Home() {
         </button>
       </section>
 
+      {showOnboarding ? (
+        <section className={styles.onboardingOverlay} aria-label="个人信息引导">
+          <div className={styles.onboardingCard}>
+            <div className={styles.sectionTitle}>
+              <div>
+                <span>开始前</span>
+                <h2>先让建议更像是给你的</h2>
+              </div>
+              <UserRound size={22} />
+            </div>
+            <p>
+              填写身高、体重、年龄和近期目标后，系统会把这些信息作为长期背景，让饮食建议更贴近日常状态。
+            </p>
+            <div className={styles.onboardingActions}>
+              <button type="button" onClick={finishOnboarding}>
+                保存并开始记录
+              </button>
+              <button type="button" onClick={skipOnboarding}>
+                先跳过
+              </button>
+            </div>
+          </div>
+        </section>
+      ) : null}
+
+      {showProfilePanel || showOnboarding ? (
       <section className={styles.profilePanel}>
         <div className={styles.profileHeader}>
           <div>
@@ -774,7 +830,10 @@ export default function Home() {
           </div>
         )}
       </section>
+      ) : null}
 
+      <div className={styles.tabContent}>
+      {activeTab === "record" ? (
       <section className={styles.panel} ref={uploadSectionRef}>
         <div className={styles.sectionTitle}>
           <div>
@@ -910,7 +969,10 @@ export default function Home() {
           </div>
         </div>
       </section>
+      ) : null}
 
+      {activeTab === "today" ? (
+      <>
       <section className={styles.panel}>
         <div className={styles.sectionTitle}>
           <div>
@@ -933,8 +995,51 @@ export default function Home() {
           ))}
         </div>
       </section>
+      <section className={styles.panel}>
+        <div className={styles.sectionTitle}>
+          <div>
+            <span>饮食分析区</span>
+            <h2>今日营养结构</h2>
+          </div>
+          <Activity size={22} />
+        </div>
 
+        <div className={styles.analysisStats}>
+          <ObservationMetric label="今日总热量" value={`${totals.calories} kcal`} />
+          <ObservationMetric label="结构评分" value={todayRecords.length ? `${score} 分` : "--"} />
+          <ObservationMetric label="蔬菜占比" value={`${totals.vegetableRatio}%`} />
+        </div>
+
+        <div className={styles.analysisGrid}>
+          <div className={styles.macroBlock}>
+            <div className={styles.macroBar} aria-label="三大营养素比例">
+              <span style={{ width: `${(totals.protein / macrosTotal) * 100}%`, background: "var(--green)" }} />
+              <span style={{ width: `${(totals.carbs / macrosTotal) * 100}%`, background: "var(--blue)" }} />
+              <span style={{ width: `${(totals.fat / macrosTotal) * 100}%`, background: "var(--coral)" }} />
+            </div>
+            <div className={styles.macroLegend}>
+              <span>蛋白质 {totals.protein}g</span>
+              <span>碳水 {totals.carbs}g</span>
+              <span>脂肪 {totals.fat}g</span>
+            </div>
+          </div>
+
+          <div className={styles.adviceCard}>
+            <span>今日轻度建议</span>
+            <p>{advice}</p>
+          </div>
+        </div>
+        <div className={styles.privacyNote}>
+          <ShieldCheck size={17} />
+          当前饮食记录和个人档案只保存在当前浏览器；换设备或清理缓存后可能看不到这些记录。
+        </div>
+      </section>
+      </>
+      ) : null}
+
+      {activeTab === "observe" || activeTab === "next" ? (
       <section className={styles.insightGrid}>
+        {activeTab === "observe" ? (
         <div className={styles.panel}>
           <div className={styles.sectionTitle}>
             <div>
@@ -1026,7 +1131,9 @@ export default function Home() {
             </div>
           </div>
         </div>
+        ) : null}
 
+        {activeTab === "next" ? (
         <div className={styles.panel}>
           <div className={styles.sectionTitle}>
             <div>
@@ -1068,47 +1175,27 @@ export default function Home() {
             <ObservationMetric label="主要场景" value={topScene} />
           </div>
         </div>
+        ) : null}
       </section>
+      ) : null}
+      </div>
 
-      <section className={styles.panel}>
-        <div className={styles.sectionTitle}>
-          <div>
-            <span>饮食分析区</span>
-            <h2>今日营养结构</h2>
-          </div>
-          <Activity size={22} />
-        </div>
-
-        <div className={styles.analysisStats}>
-          <ObservationMetric label="今日总热量" value={`${totals.calories} kcal`} />
-          <ObservationMetric label="结构评分" value={todayRecords.length ? `${score} 分` : "--"} />
-          <ObservationMetric label="蔬菜占比" value={`${totals.vegetableRatio}%`} />
-        </div>
-
-        <div className={styles.analysisGrid}>
-          <div className={styles.macroBlock}>
-            <div className={styles.macroBar} aria-label="三大营养素比例">
-              <span style={{ width: `${(totals.protein / macrosTotal) * 100}%`, background: "var(--green)" }} />
-              <span style={{ width: `${(totals.carbs / macrosTotal) * 100}%`, background: "var(--blue)" }} />
-              <span style={{ width: `${(totals.fat / macrosTotal) * 100}%`, background: "var(--coral)" }} />
-            </div>
-            <div className={styles.macroLegend}>
-              <span>蛋白质 {totals.protein}g</span>
-              <span>碳水 {totals.carbs}g</span>
-              <span>脂肪 {totals.fat}g</span>
-            </div>
-          </div>
-
-          <div className={styles.adviceCard}>
-            <span>今日轻度建议</span>
-            <p>{advice}</p>
-          </div>
-        </div>
-        <div className={styles.privacyNote}>
-          <ShieldCheck size={17} />
-          当前饮食记录和个人档案只保存在当前浏览器；换设备或清理缓存后可能看不到这些记录。
-        </div>
-      </section>
+      <nav className={styles.bottomNav} aria-label="应用板块">
+        {appTabs.map((tab) => {
+          const Icon = tab.icon;
+          return (
+            <button
+              key={tab.key}
+              type="button"
+              className={activeTab === tab.key ? styles.activeTab : ""}
+              onClick={() => setActiveTab(tab.key)}
+            >
+              <Icon size={18} />
+              <span>{tab.label}</span>
+            </button>
+          );
+        })}
+      </nav>
     </main>
   );
 }
