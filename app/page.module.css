@@ -9,7 +9,7 @@
   align-items: flex-start;
   justify-content: space-between;
   gap: 18px;
-  padding: 16px 0 18px;
+  padding: 12px 0 16px;
 }
 
 .brandRow {
@@ -26,32 +26,32 @@
   height: 42px;
   border-radius: 8px;
   color: #fff;
-  background: var(--green);
-  box-shadow: 0 10px 25px rgba(217, 120, 41, 0.24);
+  background: var(--tomato);
+  box-shadow: 0 10px 25px rgba(217, 95, 67, 0.18);
 }
 
 .agentName {
-  color: var(--green-dark);
+  color: var(--leaf);
   font-size: 14px;
   font-weight: 700;
   padding: 7px 10px;
-  border: 1px solid rgba(217, 120, 41, 0.24);
+  border: 1px solid rgba(102, 130, 78, 0.24);
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.72);
 }
 
 .hero h1 {
   margin: 0;
-  font-size: clamp(42px, 9vw, 72px);
-  line-height: 0.98;
+  font-size: clamp(40px, 7vw, 58px);
+  line-height: 1;
   letter-spacing: 0;
 }
 
 .hero p {
   max-width: 620px;
-  margin: 16px 0 0;
+  margin: 12px 0 0;
   color: var(--muted);
-  font-size: 18px;
+  font-size: 17px;
   line-height: 1.7;
 }
 
@@ -81,9 +81,8 @@
 }
 
 .heroActions button:last-child {
-  color: var(--green-dark);
-  border: 1px solid rgba(217, 120, 41, 0.26);
-  background: rgba(255, 255, 255, 0.84);
+  color: #fff;
+  background: var(--green);
 }
 
 .iconButton {
@@ -102,28 +101,58 @@
 .profilePanel {
   margin: 0 0 16px;
   padding: 16px;
-  border: 1px solid rgba(217, 120, 41, 0.18);
+  border: 1px solid rgba(102, 130, 78, 0.18);
   border-radius: 8px;
   background: rgba(255, 255, 255, 0.86);
   box-shadow: var(--shadow);
 }
 
 .onboardingOverlay {
-  margin: 0 0 16px;
+  position: fixed;
+  z-index: 12;
+  left: 50%;
+  bottom: 98px;
+  width: min(430px, calc(100% - 24px));
+  transform: translateX(-50%);
 }
 
 .onboardingCard {
-  padding: 18px;
-  border: 1px solid rgba(217, 120, 41, 0.24);
+  position: relative;
+  display: grid;
+  gap: 8px;
+  padding: 16px;
+  border: 2px dashed rgba(217, 120, 41, 0.72);
   border-radius: 8px;
   background: #fff7ea;
   box-shadow: var(--shadow);
 }
 
+.onboardingCard::after {
+  position: absolute;
+  right: 8%;
+  bottom: -29px;
+  width: 1px;
+  height: 27px;
+  border-right: 2px dashed rgba(217, 120, 41, 0.72);
+  content: "";
+}
+
+.guideEyebrow {
+  color: var(--green-dark);
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.onboardingCard > strong {
+  font-size: 17px;
+  line-height: 1.45;
+}
+
 .onboardingCard p {
-  margin: 0 0 14px;
+  margin: 0;
   color: var(--muted);
-  line-height: 1.65;
+  font-size: 13px;
+  line-height: 1.55;
 }
 
 .onboardingActions {
@@ -184,6 +213,34 @@
   background: var(--green);
   font-weight: 800;
   cursor: pointer;
+}
+
+.profileWelcome {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-top: 14px;
+  padding: 13px;
+  color: var(--green-dark);
+  border: 1px dashed rgba(217, 120, 41, 0.48);
+  border-radius: 8px;
+  background: #fff7ea;
+}
+
+.profileWelcome svg {
+  flex: 0 0 auto;
+}
+
+.profileWelcome div {
+  display: grid;
+  gap: 4px;
+}
+
+.profileWelcome p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.55;
 }
 
 .profileForm {
@@ -294,8 +351,28 @@
   font-weight: 800;
 }
 
+.profileActions {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.profileActions button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 44px;
+  padding: 0 16px;
+  color: #fff;
+  border-radius: 8px;
+  background: var(--green);
+  font-weight: 800;
+  cursor: pointer;
+}
+
 .panel {
-  border: 1px solid rgba(130, 77, 35, 0.12);
+  border: 1px solid rgba(79, 96, 64, 0.12);
   border-radius: 8px;
   background: rgba(255, 255, 255, 0.88);
   box-shadow: var(--shadow);
@@ -303,7 +380,7 @@
 
 .tabContent {
   min-height: 560px;
-  padding-bottom: 44px;
+  padding-bottom: 78px;
 }
 
 .bottomNav {
@@ -312,14 +389,14 @@
   left: 50%;
   bottom: 16px;
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   gap: 6px;
   width: min(620px, calc(100% - 24px));
   padding: 8px;
-  border: 1px solid rgba(130, 77, 35, 0.14);
+  border: 1px solid rgba(79, 96, 64, 0.16);
   border-radius: 18px;
   background: rgba(255, 255, 255, 0.92);
-  box-shadow: 0 18px 45px rgba(105, 61, 27, 0.18);
+  box-shadow: 0 16px 42px rgba(67, 54, 42, 0.16);
   transform: translateX(-50%);
   backdrop-filter: blur(16px);
 }
@@ -339,7 +416,22 @@
 
 .bottomNav .activeTab {
   color: #fff;
-  background: var(--green);
+  background: var(--tomato);
+}
+
+.bottomNav .guidedTab {
+  outline: 2px dashed var(--green);
+  outline-offset: -3px;
+  animation: guidePulse 1.8s ease-in-out infinite;
+}
+
+.bottomNav .activeTab.guidedTab {
+  outline-color: #fff3df;
+}
+
+@keyframes guidePulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(217, 120, 41, 0.18); }
+  50% { box-shadow: 0 0 0 7px rgba(217, 120, 41, 0); }
 }
 
 .cardLabel,
@@ -369,7 +461,7 @@
 }
 
 .sectionTitle svg {
-  color: var(--green);
+  color: var(--leaf);
 }
 
 .uploadGrid {
@@ -390,7 +482,7 @@
   min-height: 330px;
   overflow: hidden;
   color: var(--ink);
-  border: 1px dashed rgba(47, 143, 91, 0.42);
+  border: 1px dashed rgba(102, 130, 78, 0.55);
   border-radius: 8px;
   background: var(--surface-soft);
   cursor: pointer;
@@ -401,7 +493,7 @@
   height: 100%;
   min-height: 330px;
   object-fit: contain;
-  background: #f7faf7;
+  background: #f7f5ef;
 }
 
 .uploadEmpty,
@@ -417,7 +509,7 @@
 
 .uploadEmpty svg,
 .idleState svg {
-  color: var(--green);
+  color: var(--leaf);
 }
 
 .errorState svg {
@@ -464,7 +556,7 @@
   padding: 12px;
   border: 1px solid var(--line);
   border-radius: 8px;
-  background: #fff;
+  background: #fffdf9;
 }
 
 .textMealBox textarea {
@@ -511,7 +603,7 @@
   padding: 18px;
   border: 1px solid var(--line);
   border-radius: 8px;
-  background: #fff;
+  background: #fffdf9;
 }
 
 .spin {
@@ -589,7 +681,7 @@
 
 .foodTags span {
   padding: 8px 10px;
-  color: var(--green-dark);
+  color: #4f673d;
   border-radius: 999px;
   background: var(--mint);
   font-size: 14px;
@@ -642,7 +734,7 @@
 .verdict {
   margin: 18px 0;
   padding: 13px;
-  color: #4e5c52;
+  color: #654732;
   border-radius: 8px;
   background: var(--surface-warm);
   line-height: 1.6;
@@ -726,7 +818,7 @@
   padding: 16px;
   border: 1px solid var(--line);
   border-radius: 8px;
-  background: #fff;
+  background: #fffdf9;
 }
 
 .mealCardHead {
@@ -748,7 +840,7 @@
   padding: 16px;
   color: var(--muted);
   border-radius: 8px;
-  background: #f7faf7;
+  background: var(--leaf-soft);
   text-align: center;
   line-height: 1.5;
 }
@@ -975,9 +1067,9 @@
   margin-top: 12px;
   padding: 12px 14px;
   color: var(--muted);
-  border: 1px solid rgba(47, 143, 91, 0.16);
+  border: 1px solid rgba(102, 130, 78, 0.2);
   border-radius: 8px;
-  background: #fbfdfb;
+  background: var(--leaf-soft);
   font-size: 13px;
   font-weight: 700;
   line-height: 1.55;
@@ -985,7 +1077,7 @@
 
 .privacyNote svg {
   flex: 0 0 auto;
-  color: var(--green);
+  color: var(--leaf);
 }
 
 .rangeSwitch {
@@ -1340,11 +1432,28 @@
 
 @media (max-width: 520px) {
   .shell {
-    padding: 18px 12px 98px;
+    padding: 16px 12px 124px;
   }
 
   .hero p {
     font-size: 16px;
+  }
+
+  .bottomNav {
+    bottom: max(10px, env(safe-area-inset-bottom));
+  }
+
+  .bottomNav button {
+    min-width: 0;
+    min-height: 50px;
+    padding: 4px 2px;
+  }
+
+  .bottomNav button span {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .panel {

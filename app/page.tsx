@@ -2,23 +2,26 @@
 
 import {
   Activity,
-  Camera,
   CalendarDays,
   Check,
   ChevronRight,
   Clock3,
+  ClipboardList,
+  CookingPot,
   Edit3,
+  ImagePlus,
   Loader2,
   Mic,
+  NotebookPen,
+  Salad,
+  Soup,
   UserRound,
   Plus,
   RefreshCw,
   RotateCcw,
   Save,
-  Sparkles,
   ShieldCheck,
   Trash2,
-  Upload,
   Utensils,
   X
 } from "lucide-react";
@@ -61,7 +64,7 @@ type UserProfile = {
 
 type ObservationRange = "week" | "month";
 type RecognitionStage = "idle" | "uploading" | "recognizing" | "returning";
-type AppTab = "record" | "today" | "observe" | "next";
+type AppTab = "record" | "today" | "observe" | "next" | "profile";
 
 type SpeechRecognitionConstructor = new () => {
   lang: string;
@@ -415,7 +418,6 @@ export default function Home() {
     const seenOnboarding = window.localStorage.getItem("chileme-onboarding-seen");
     if (!seenOnboarding) {
       setShowOnboarding(true);
-      setShowProfilePanel(true);
     }
   }, []);
 
@@ -465,10 +467,11 @@ export default function Home() {
   const activeRecognitionStepIndex = Math.max(0, recognitionSteps.findIndex((step) => step.key === recognitionStage));
   const activeRecognitionStep = recognitionSteps.find((step) => step.key === recognitionStage) || recognitionSteps[0];
   const appTabs: Array<{ key: AppTab; label: string; icon: LucideIcon }> = [
-    { key: "record", label: "记录", icon: Camera },
-    { key: "today", label: "今日", icon: Check },
+    { key: "record", label: "我的记录", icon: NotebookPen },
+    { key: "today", label: "今日", icon: Soup },
     { key: "observe", label: "观察", icon: CalendarDays },
-    { key: "next", label: "下一餐", icon: Clock3 }
+    { key: "next", label: "下一餐", icon: Salad },
+    { key: "profile", label: "我的", icon: UserRound }
   ];
 
   function scrollToUpload() {
@@ -477,16 +480,40 @@ export default function Home() {
   }
 
   function finishOnboarding() {
+    window.localStorage.setItem("chileme-profile", JSON.stringify(profile));
     window.localStorage.setItem("chileme-onboarding-seen", "true");
     setShowOnboarding(false);
     setShowProfilePanel(false);
     setActiveTab("record");
+    setToast("个人档案已保存，可以开始记录了");
   }
 
   function skipOnboarding() {
     window.localStorage.setItem("chileme-onboarding-seen", "true");
     setShowOnboarding(false);
     setShowProfilePanel(false);
+  }
+
+  function openProfileFromGuide() {
+    setActiveTab("profile");
+    setShowProfilePanel(true);
+  }
+
+  function saveProfile() {
+    window.localStorage.setItem("chileme-profile", JSON.stringify(profile));
+    if (showOnboarding) {
+      finishOnboarding();
+      return;
+    }
+    setShowProfilePanel(false);
+    setToast("个人档案已保存");
+  }
+
+  function handleTabChange(tab: AppTab) {
+    setActiveTab(tab);
+    if (tab === "profile") {
+      setShowProfilePanel(true);
+    }
   }
 
   function fillSampleText() {
@@ -567,12 +594,12 @@ export default function Home() {
         };
         if (!response.ok || !data.result) {
           setRecognitionDebug("");
-          throw new Error(data.error || "智能分析暂时不可用，请稍后再试。");
+          throw new Error(data.error || "这次没有整理成功，请稍后再试。");
         }
         setRecognition(data.result);
         setRecognitionMode(data.mode || "kimi");
       } catch (error) {
-        const message = error instanceof Error ? error.message : "智能分析暂时不可用，请稍后再试。";
+        const message = error instanceof Error ? error.message : "这次没有整理成功，请稍后再试。";
         setRecognitionError(message);
         setToast(message);
       } finally {
@@ -687,148 +714,21 @@ export default function Home() {
     <main className={styles.shell}>
       {toast ? <div className={styles.toast}>{toast}</div> : null}
 
+      {activeTab === "record" ? (
       <section className={styles.hero}>
         <div>
           <div className={styles.brandRow}>
             <span className={styles.logo}>
               <Utensils size={22} />
             </span>
-            <span className={styles.agentName}>饮食助手</span>
+            <span className={styles.agentName}>饮食日记</span>
           </div>
           <h1>吃了么</h1>
-          <p>拍一张餐食照片，自动生成饮食记录，轻松看懂今天吃得怎么样。</p>
-          <div className={styles.heroActions}>
-            <button type="button" onClick={scrollToUpload}>
-              <Camera size={17} />
-              开始记录
-            </button>
-            <button type="button" onClick={() => setShowProfilePanel((current) => !current)}>
-              <UserRound size={17} />
-              个人档案
-            </button>
-          </div>
+          <p>拍下这一餐，把今天吃过的东西好好记下来。</p>
         </div>
         <button className={styles.iconButton} type="button" onClick={resetDemo} aria-label="清空今日记录">
           <RotateCcw size={18} />
         </button>
-      </section>
-
-      {showOnboarding ? (
-        <section className={styles.onboardingOverlay} aria-label="个人信息引导">
-          <div className={styles.onboardingCard}>
-            <div className={styles.sectionTitle}>
-              <div>
-                <span>开始前</span>
-                <h2>先让建议更像是给你的</h2>
-              </div>
-              <UserRound size={22} />
-            </div>
-            <p>
-              填写身高、体重、年龄和近期目标后，系统会把这些信息作为长期背景，让饮食建议更贴近日常状态。
-            </p>
-            <div className={styles.onboardingActions}>
-              <button type="button" onClick={finishOnboarding}>
-                保存并开始记录
-              </button>
-              <button type="button" onClick={skipOnboarding}>
-                先跳过
-              </button>
-            </div>
-          </div>
-        </section>
-      ) : null}
-
-      {showProfilePanel || showOnboarding ? (
-      <section className={styles.profilePanel}>
-        <div className={styles.profileHeader}>
-          <div>
-            <span>
-              <UserRound size={16} />
-              个人档案
-            </span>
-            <strong>
-              {profile.name || "未命名用户"} · {profile.goal}
-            </strong>
-          </div>
-          <button type="button" onClick={() => setShowProfilePanel((current) => !current)}>
-            {showProfilePanel ? "收起" : "编辑档案"}
-          </button>
-        </div>
-        {showProfilePanel ? (
-          <div className={styles.profileForm}>
-            <label>
-              昵称
-              <input value={profile.name} onChange={(event) => setProfile({ ...profile, name: event.target.value })} placeholder="例如 小周" />
-            </label>
-            <label>
-              身高 cm
-              <input value={profile.height} onChange={(event) => setProfile({ ...profile, height: event.target.value })} inputMode="decimal" placeholder="例如 170" />
-            </label>
-            <label>
-              体重 kg
-              <input value={profile.weight} onChange={(event) => setProfile({ ...profile, weight: event.target.value })} inputMode="decimal" placeholder="例如 62" />
-            </label>
-            <label>
-              年龄
-              <input value={profile.age} onChange={(event) => setProfile({ ...profile, age: event.target.value })} inputMode="numeric" placeholder="例如 22" />
-            </label>
-            <label>
-              性别
-              <select value={profile.gender} onChange={(event) => setProfile({ ...profile, gender: event.target.value })}>
-                <option>未设置</option>
-                <option>女</option>
-                <option>男</option>
-                <option>其他</option>
-              </select>
-            </label>
-            <label>
-              目标
-              <select value={profile.goal} onChange={(event) => setProfile({ ...profile, goal: event.target.value })}>
-                <option>保持均衡</option>
-                <option>减脂入门</option>
-                <option>增肌补蛋白</option>
-                <option>少油清淡</option>
-                <option>规律吃饭</option>
-              </select>
-            </label>
-            <div className={styles.profileNeedBlock}>
-              <span>近期需求</span>
-              <div>
-                {needOptions.map((need) => (
-                  <button
-                    key={need}
-                    type="button"
-                    className={profile.needs.includes(need) ? styles.activeNeed : ""}
-                    onClick={() => toggleNeed(need)}
-                  >
-                    {need}
-                  </button>
-                ))}
-              </div>
-            </div>
-            <label className={styles.fullField}>
-              我的饮食偏好
-              <textarea
-                value={profile.customNeed}
-                onChange={(event) => setProfile({ ...profile, customNeed: event.target.value })}
-                rows={3}
-                placeholder="例如：我最近一周在健身，希望每餐多关注蛋白质；晚上尽量少油少碳水。"
-              />
-            </label>
-            <p className={styles.promptHint}>
-              这些偏好会帮助系统给出更贴近你的日常饮食建议，不会作为医疗诊断依据。
-            </p>
-          </div>
-        ) : (
-          <div className={styles.profileChips}>
-            <span>{profile.height ? `${profile.height}cm` : "身高待填"}</span>
-            <span>{profile.weight ? `${profile.weight}kg` : "体重待填"}</span>
-            <span>{profile.age ? `${profile.age}岁` : "年龄待填"}</span>
-            {[...profile.needs, profile.customNeed.trim()].filter(Boolean).slice(0, 2).map((need) => (
-              <span key={need}>{need}</span>
-            ))}
-          </div>
-        )}
       </section>
       ) : null}
 
@@ -837,10 +737,10 @@ export default function Home() {
       <section className={styles.panel} ref={uploadSectionRef}>
         <div className={styles.sectionTitle}>
           <div>
-            <span>上传记录区</span>
-            <h2>记录这一餐</h2>
+            <span>今天的餐单</span>
+            <h2>记下这一餐</h2>
           </div>
-          <Sparkles size={22} />
+          <CookingPot size={22} />
         </div>
 
         <div className={styles.uploadGrid}>
@@ -850,9 +750,9 @@ export default function Home() {
                 <img src={preview} alt="餐食预览" />
               ) : (
                 <div className={styles.uploadEmpty}>
-                  <Camera size={34} />
-                  <strong>上传餐食图片</strong>
-                  <span>上传后会自动分析菜品、热量和营养结构</span>
+                  <ImagePlus size={34} />
+                  <strong>拍下这一餐</strong>
+                  <span>用一张照片留下今天吃过的东西</span>
                 </div>
               )}
             </button>
@@ -866,16 +766,16 @@ export default function Home() {
               />
               <div className={styles.textMealActions}>
                 <button type="button" className={styles.secondaryButton} onClick={fillSampleText}>
-                  <Sparkles size={16} />
-                  示例
+                  <NotebookPen size={16} />
+                  填个例子
                 </button>
                 <button type="button" className={styles.secondaryButton} onClick={startVoiceInput}>
                   <Mic size={16} />
                   {isListening ? "聆听中" : "语音输入"}
                 </button>
                 <button type="button" onClick={handleTextEstimate} disabled={isTextEstimating}>
-                  {isTextEstimating ? <Loader2 className={styles.spin} size={16} /> : <Sparkles size={16} />}
-                  {isTextEstimating ? "分析中" : "文字分析"}
+                  {isTextEstimating ? <Loader2 className={styles.spin} size={16} /> : <ClipboardList size={16} />}
+                  {isTextEstimating ? "整理中" : "整理成记录"}
                 </button>
               </div>
             </div>
@@ -906,14 +806,14 @@ export default function Home() {
                 <div className={styles.resultHeader}>
                   <span>
                     <Check size={16} />
-                    分析完成
+                    已整理好
                   </span>
                   <strong>{recognition.calories} kcal</strong>
                 </div>
                 <p className={styles.modelNote}>
                   {recognitionMode === "kimi"
-                    ? "已完成初步分析，建议确认菜品后再生成记录。"
-                    : "建议确认菜品后再生成饮食记录。"}
+                    ? "先确认一下菜品，再存进今天的餐单。"
+                    : "确认菜品后，就可以存进今天的餐单。"}
                 </p>
                 <div className={styles.foodTags}>
                   {recognition.foods.map((food) => (
@@ -957,13 +857,13 @@ export default function Home() {
                 <X size={28} />
                 <strong>{recognitionError}</strong>
                 {recognitionDebug ? <small>{recognitionDebug}</small> : null}
-                <span>智能分析暂时不可用，可以稍后再试，或先用文字手动记录这一餐。</span>
+                <span>这次没有认出来，可以换一张更清楚的照片，或直接用文字描述。</span>
               </div>
             ) : (
               <div className={styles.idleState}>
-                <Upload size={28} />
-                <strong>等待上传</strong>
-                <span>上传后会展示菜品、热量、营养结构和餐食评价。</span>
+                <Soup size={28} />
+                <strong>这一餐还没记录</strong>
+                <span>上传照片，或者直接说说你吃了什么。</span>
               </div>
             )}
           </div>
@@ -976,8 +876,8 @@ export default function Home() {
       <section className={styles.panel}>
         <div className={styles.sectionTitle}>
           <div>
-            <span>饮食记录区</span>
-            <h2>今天已经记录的餐食</h2>
+            <span>今天吃过的</span>
+            <h2>今日餐单</h2>
           </div>
           <ChevronRight size={22} />
         </div>
@@ -998,8 +898,8 @@ export default function Home() {
       <section className={styles.panel}>
         <div className={styles.sectionTitle}>
           <div>
-            <span>饮食分析区</span>
-            <h2>今日营养结构</h2>
+            <span>今天的摄入</span>
+            <h2>营养概览</h2>
           </div>
           <Activity size={22} />
         </div>
@@ -1178,7 +1078,136 @@ export default function Home() {
         ) : null}
       </section>
       ) : null}
+
+      {activeTab === "profile" ? (
+      <section className={styles.profilePanel} aria-label="我的个人档案">
+        <div className={styles.profileHeader}>
+          <div>
+            <span>
+              <UserRound size={16} />
+              我的
+            </span>
+            <strong>
+              {profile.name || "欢迎来到吃了么"} · {profile.goal}
+            </strong>
+          </div>
+          <button type="button" onClick={() => setShowProfilePanel((current) => !current)}>
+            {showProfilePanel ? "收起" : "编辑档案"}
+          </button>
+        </div>
+
+        {showOnboarding ? (
+          <div className={styles.profileWelcome}>
+            <UserRound size={20} />
+            <div>
+              <strong>完善个人档案</strong>
+              <p>这些信息会让饮食建议更贴近你的日常状态，之后也可以随时回来修改。</p>
+            </div>
+          </div>
+        ) : null}
+
+        {showProfilePanel ? (
+          <div className={styles.profileForm}>
+            <label>
+              昵称
+              <input value={profile.name} onChange={(event) => setProfile({ ...profile, name: event.target.value })} placeholder="例如 小周" />
+            </label>
+            <label>
+              身高 cm
+              <input value={profile.height} onChange={(event) => setProfile({ ...profile, height: event.target.value })} inputMode="decimal" placeholder="例如 170" />
+            </label>
+            <label>
+              体重 kg
+              <input value={profile.weight} onChange={(event) => setProfile({ ...profile, weight: event.target.value })} inputMode="decimal" placeholder="例如 62" />
+            </label>
+            <label>
+              年龄
+              <input value={profile.age} onChange={(event) => setProfile({ ...profile, age: event.target.value })} inputMode="numeric" placeholder="例如 22" />
+            </label>
+            <label>
+              性别
+              <select value={profile.gender} onChange={(event) => setProfile({ ...profile, gender: event.target.value })}>
+                <option>未设置</option>
+                <option>女</option>
+                <option>男</option>
+                <option>其他</option>
+              </select>
+            </label>
+            <label>
+              目标
+              <select value={profile.goal} onChange={(event) => setProfile({ ...profile, goal: event.target.value })}>
+                <option>保持均衡</option>
+                <option>减脂入门</option>
+                <option>增肌补蛋白</option>
+                <option>少油清淡</option>
+                <option>规律吃饭</option>
+              </select>
+            </label>
+            <div className={styles.profileNeedBlock}>
+              <span>近期需求</span>
+              <div>
+                {needOptions.map((need) => (
+                  <button
+                    key={need}
+                    type="button"
+                    className={profile.needs.includes(need) ? styles.activeNeed : ""}
+                    onClick={() => toggleNeed(need)}
+                  >
+                    {need}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <label className={styles.fullField}>
+              我的饮食偏好
+              <textarea
+                value={profile.customNeed}
+                onChange={(event) => setProfile({ ...profile, customNeed: event.target.value })}
+                rows={3}
+                placeholder="例如：我最近一周在健身，希望每餐多关注蛋白质；晚上尽量少油少碳水。"
+              />
+            </label>
+            <p className={styles.promptHint}>
+              这些偏好会帮助系统给出更贴近你的日常饮食建议，不会作为医疗诊断依据。
+            </p>
+            <div className={styles.profileActions}>
+              <button type="button" onClick={saveProfile}>
+                <Save size={16} />
+                {showOnboarding ? "保存并开始记录" : "保存个人档案"}
+              </button>
+            </div>
+          </div>
+        ) : (
+          <div className={styles.profileChips}>
+            <span>{profile.height ? `${profile.height}cm` : "身高待填"}</span>
+            <span>{profile.weight ? `${profile.weight}kg` : "体重待填"}</span>
+            <span>{profile.age ? `${profile.age}岁` : "年龄待填"}</span>
+            {[...profile.needs, profile.customNeed.trim()].filter(Boolean).slice(0, 2).map((need) => (
+              <span key={need}>{need}</span>
+            ))}
+          </div>
+        )}
+        <div className={styles.privacyNote}>
+          <ShieldCheck size={17} />
+          个人档案和饮食记录只保存在当前浏览器，换设备或清理缓存后可能看不到。
+        </div>
+      </section>
+      ) : null}
       </div>
+
+      {showOnboarding && activeTab !== "profile" ? (
+        <aside className={styles.onboardingOverlay} aria-label="个人信息引导">
+          <div className={styles.onboardingCard}>
+            <span className={styles.guideEyebrow}>第一次使用</span>
+            <strong>先完善个人档案</strong>
+            <p>从底部进入“我的”，填好基本信息，让之后的饮食建议更适合你。</p>
+            <div className={styles.onboardingActions}>
+              <button type="button" onClick={openProfileFromGuide}>去“我的”填写</button>
+              <button type="button" onClick={skipOnboarding}>稍后再说</button>
+            </div>
+          </div>
+        </aside>
+      ) : null}
 
       <nav className={styles.bottomNav} aria-label="应用板块">
         {appTabs.map((tab) => {
@@ -1187,8 +1216,11 @@ export default function Home() {
             <button
               key={tab.key}
               type="button"
-              className={activeTab === tab.key ? styles.activeTab : ""}
-              onClick={() => setActiveTab(tab.key)}
+              className={[
+                activeTab === tab.key ? styles.activeTab : "",
+                showOnboarding && tab.key === "profile" ? styles.guidedTab : ""
+              ].filter(Boolean).join(" ")}
+              onClick={() => handleTabChange(tab.key)}
             >
               <Icon size={18} />
               <span>{tab.label}</span>

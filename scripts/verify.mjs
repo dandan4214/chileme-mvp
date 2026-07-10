@@ -60,7 +60,7 @@ async function seed(page) {
 }
 
 async function clickTab(page, label) {
-  await page.getByRole("navigation", { name: "应用板块" }).getByRole("button", { name: label }).click();
+  await page.getByRole("navigation", { name: "应用板块" }).getByRole("button", { name: label, exact: true }).click();
   await page.waitForTimeout(120);
   return page.locator("body").innerText();
 }
@@ -72,12 +72,14 @@ desktop.on("console", (msg) => {
 });
 await seed(desktop);
 await desktop.goto(appUrl, { waitUntil: "networkidle" });
-await desktop.getByRole("button", { name: /示例/ }).first().click();
+await desktop.getByRole("button", { name: "填个例子", exact: true }).click();
 const desktopRecordText = await desktop.locator("body").innerText();
 const sampleText = await desktop.locator("textarea").first().inputValue();
 const desktopTodayText = await clickTab(desktop, "今日");
 const desktopObserveText = await clickTab(desktop, "观察");
 const desktopNextText = await clickTab(desktop, "下一餐");
+const desktopProfileText = await clickTab(desktop, "我的");
+await clickTab(desktop, "我的记录");
 await desktop.screenshot({ path: "verification-desktop.png", fullPage: true });
 
 const mobile = await browser.newPage({ viewport: { width: 390, height: 900 }, isMobile: true });
@@ -90,27 +92,42 @@ await mobile.goto(appUrl, { waitUntil: "networkidle" });
 const mobileRecordText = await mobile.locator("body").innerText();
 const mobileTodayText = await clickTab(mobile, "今日");
 const mobileObserveText = await clickTab(mobile, "观察");
+const mobileProfileText = await clickTab(mobile, "我的");
+await clickTab(mobile, "我的记录");
 await mobile.screenshot({ path: "verification-mobile.png", fullPage: true });
+
+const onboarding = await browser.newPage({ viewport: { width: 390, height: 900 }, isMobile: true });
+await onboarding.goto(appUrl, { waitUntil: "networkidle" });
+const onboardingBefore = await onboarding.locator("body").innerText();
+await onboarding.screenshot({ path: "verification-onboarding.png", fullPage: false });
+await onboarding.getByRole("button", { name: "去“我的”填写" }).click();
+const onboardingAfter = await onboarding.locator("body").innerText();
 
 await browser.close();
 
 const result = {
   desktop: {
     hasContent: desktopRecordText.includes("吃了么"),
-    hasRecordAgent: desktopRecordText.includes("记录这一餐") && desktopRecordText.includes("上传餐食图片"),
+    hasRecordAgent: desktopRecordText.includes("记下这一餐") && desktopRecordText.includes("拍下这一餐"),
     hasSnack: desktopTodayText.includes("加餐") && desktopTodayText.includes("酸奶"),
-    hasAnalysis: desktopTodayText.includes("今日营养结构") && desktopTodayText.includes("当前浏览器"),
+    hasAnalysis: desktopTodayText.includes("营养概览") && desktopTodayText.includes("当前浏览器"),
     hasCalendar: desktopObserveText.includes("每日食物观察") && desktopObserveText.includes("常出现食物"),
     hasNextMeal: desktopNextText.includes("下一餐方向") && desktopNextText.includes("下一餐状态"),
+    hasProfile: desktopProfileText.includes("个人档案") && desktopProfileText.includes("我的饮食偏好"),
     sampleFilled: sampleText.includes("午餐吃了蛋炒饭一盘"),
     errors
   },
   mobile: {
     hasContent: mobileRecordText.includes("吃了么"),
-    hasUpload: mobileRecordText.includes("上传餐食图片") || mobileRecordText.includes("记录这一餐"),
-    hasToday: mobileTodayText.includes("今天已经记录的餐食") && mobileTodayText.includes("当前浏览器"),
+    hasUpload: mobileRecordText.includes("拍下这一餐") || mobileRecordText.includes("记下这一餐"),
+    hasToday: mobileTodayText.includes("今日餐单") && mobileTodayText.includes("当前浏览器"),
     hasCalendar: mobileObserveText.includes("每日食物观察") && mobileObserveText.includes("常出现食物"),
+    hasProfile: mobileProfileText.includes("个人档案") && mobileProfileText.includes("最近在健身"),
     errors: mobileErrors
+  },
+  onboarding: {
+    hasGuide: onboardingBefore.includes("先完善个人档案") && onboardingBefore.includes("饮食建议更适合你"),
+    opensProfile: onboardingAfter.includes("完善个人档案") && onboardingAfter.includes("保存并开始记录")
   }
 };
 
@@ -122,6 +139,7 @@ if (
   !result.desktop.hasSnack ||
   !result.desktop.hasAnalysis ||
   !result.desktop.hasNextMeal ||
+  !result.desktop.hasProfile ||
   !result.desktop.hasCalendar ||
   !result.desktop.sampleFilled ||
   result.desktop.errors.length ||
@@ -129,6 +147,9 @@ if (
   !result.mobile.hasUpload ||
   !result.mobile.hasToday ||
   !result.mobile.hasCalendar ||
+  !result.mobile.hasProfile ||
+  !result.onboarding.hasGuide ||
+  !result.onboarding.opensProfile ||
   result.mobile.errors.length
 ) {
   process.exit(1);
