@@ -1,21 +1,23 @@
 :root {
-  --bg: #f8f5ee;
-  --surface: #ffffff;
-  --surface-soft: #edf2e5;
-  --surface-warm: #fff1dc;
-  --ink: #30251f;
-  --muted: #756a61;
-  --line: #e5ddd1;
-  --green: #c9632f;
-  --green-dark: #74442d;
-  --mint: #e7efdc;
-  --amber: #e5a42c;
-  --coral: #d45d48;
-  --blue: #6f8a55;
-  --leaf: #66824e;
-  --leaf-soft: #edf3e7;
-  --tomato: #d95f43;
-  --shadow: 0 16px 42px rgba(78, 54, 38, 0.09);
+  --bg: #f4f0e8;
+  --surface: #fffefa;
+  --surface-soft: #edf1e7;
+  --surface-warm: #fff0d6;
+  --ink: #2c211b;
+  --muted: #74675e;
+  --line: #ddd3c6;
+  --green: #c85d32;
+  --green-dark: #79422d;
+  --mint: #e8eedf;
+  --amber: #dfaa4f;
+  --coral: #ca5842;
+  --blue: #58786f;
+  --leaf: #62794b;
+  --leaf-soft: #eef2e8;
+  --tomato: #d75c39;
+  --tomato-soft: #fae7df;
+  --butter: #f5e4ae;
+  --shadow: 0 18px 52px rgba(72, 50, 34, 0.08);
 }
 
 * {
@@ -30,7 +32,9 @@ body {
   margin: 0;
   color: var(--ink);
   background: var(--bg);
-  font-family: Arial, "PingFang SC", "Microsoft YaHei", sans-serif;
+  font-family: "Avenir Next", "SF Pro Display", "PingFang SC", "Microsoft YaHei", sans-serif;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
 }
 
 button,
@@ -41,6 +45,21 @@ select {
 
 button {
   border: 0;
+}
+
+button,
+select,
+textarea,
+input {
+  transition: border-color 0.18s ease, background-color 0.18s ease, color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
+}
+
+button:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+input:focus-visible {
+  outline: 3px solid rgba(223, 170, 79, 0.38);
+  outline-offset: 2px;
 }
 
 img {

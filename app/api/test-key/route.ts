@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { enforceRateLimit } from "../_lib/rate-limit";
 
 function cleanApiKey(value: string) {
   return value.replace(/^Bearer\s+/i, "").trim();
@@ -9,6 +10,9 @@ function keyTail(value: string) {
 }
 
 export async function POST(request: Request) {
+  const limited = enforceRateLimit(request, "test-key", { limit: 6, windowMs: 10 * 60 * 1000 });
+  if (limited) return limited;
+
   const keyFromHeader = request.headers.get("x-kimi-api-key") || "";
   const apiKey = cleanApiKey(keyFromHeader || process.env.KIMI_CODING_API_KEY || process.env.ANTHROPIC_AUTH_TOKEN || "");
 
@@ -26,6 +30,7 @@ export async function POST(request: Request) {
     body: JSON.stringify({
       model: process.env.KIMI_MODEL || process.env.ANTHROPIC_MODEL || "K2.6",
       max_tokens: 32,
+      thinking: { type: "disabled" },
       messages: [{ role: "user", content: "只回答 OK" }],
     })
   });
